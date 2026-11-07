@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Schools: make sure every student understood</title>
+  <meta name="description" content="Zukko asks a short quiz, gives hints instead of answers, and shows the teacher who needs help. A UzHack prototype for Uzbekistan's schools." />
+  <meta name="theme-color" content="#eef1ff" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+</head>
+<body class="booting">
+  <!-- the approved Smart Schools loading animation opens the site, with a counter in the corner -->
+  <div id="boot" aria-hidden="true">
+    <svg id="bootsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="bootn"><b id="bootn">000</b><span>%</span></div>
+    <button id="skip" type="button" data-i18n="skip">Skip</button>
+  </div>
+
+  <header class="top" id="top-bar">
+    <a class="brand" href="#top" aria-label="Smart Schools">
+      <svg viewBox="-130 -130 260 260" aria-hidden="true">
+        <path d="M12.5 -89.1 A90 90 0 0 1 89.1 -12.5" stroke="#2DE2C4" stroke-width="24" fill="none" stroke-linecap="round"/>
+        <path d="M89.1 12.5 A90 90 0 0 1 12.5 89.1" stroke="#5B8CFF" stroke-width="24" fill="none" stroke-linecap="round"/>
+        <path d="M-12.5 89.1 A90 90 0 0 1 -89.1 12.5" stroke="#FF6B5B" stroke-width="24" fill="none" stroke-linecap="round"/>
+        <path d="M-89.1 -12.5 A90 90 0 0 1 -12.5 -89.1" stroke="#FFB547" stroke-width="24" fill="none" stroke-linecap="round"/>
+        <circle r="20" fill="currentColor"/>
+      </svg>
+      <span>Smart Schools</span>
+    </a>
+    <nav class="menu" aria-label="Main"><a href="#loop" data-i18n="nav1">How it works</a><a href="#brain" data-i18n="nav2">Zukko's AI</a><a href="#report" data-i18n="nav3">For teachers</a><a href="#film" data-i18n="nav4">The film</a></nav>
+    <div class="top-right">
+      <div class="lang" role="group" aria-label="Language"><button data-lang="uz">UZ</button><button data-lang="ru">RU</button><button data-lang="en">EN</button></div>
+      <a class="btn sm blue" id="cta-top" href="#" target="_blank" rel="noopener" data-i18n="ctaTop">Try it in Telegram</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- 01 hero -->
+    <section class="hero" id="hero" data-ch="0">
+      <!-- the opening: the Earth turns to Uzbekistan as you scroll, then the skyline appears -->
+      <div class="hg-run" id="hgRun"><div class="hg-pin"><div class="hg-pic" id="hgPic"></div><canvas id="hgCanvas" aria-hidden="true"></canvas><div class="hg-dim" id="hgDim"></div>
+        <div class="hg-copy" id="hgCopy">
+          <p><span class="l1" data-i18n="hgC1a">Where curiosity meets</span><br><span class="l2" data-i18n="hgC1b">real-time intelligence.</span></p>
+          <p><span class="l1" data-i18n="hgC2a">Instant clarity for teachers,</span><br><span class="l2" data-i18n="hgC2b">infinite possibilities for students.</span></p>
+          <p><span class="l1" data-i18n="hgC3a">Adaptive learning engine</span><br><span class="l2" data-i18n="hgC3b">running beneath every lesson.</span></p>
+          <p><span class="l1" data-i18n="hgC4a">Empowering educators</span><br><span class="l2" data-i18n="hgC4b">to lead the next generation.</span></p>
+        </div></div></div>
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <h1 id="h1" class="rv" data-i18n-rich="h1">Make sure every student *understood.*</h1>
+          <p class="lead" data-i18n="heroSub">Zukko asks a short quiz, gives hints instead of answers, and shows the teacher who needs help, in a class of 35.</p>
+          <div class="btns">
+            <a class="btn blue" id="cta-hero" href="#" target="_blank" rel="noopener" data-i18n="ctaTop">Try it in Telegram</a>
+            <a class="btn white" href="#film" data-i18n="ctaFilm">Watch the 1:47 film</a>
+          </div>
+          <div class="strip" id="strip"><div class="dots" id="dots35"></div><p data-i18n="stripCap">A sample class of 35: 24 understood, 8 need a hint, 3 absent</p></div>
+        </div>
+        <div class="hero-art" id="heroArt">
+          <svg class="hero-wires" viewBox="0 0 460 560" aria-hidden="true"><g fill="none" stroke="#3B4BFF" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 9"><path class="dw" d="M130 120 C170 140 190 200 215 250"/><path class="dw" d="M370 190 C340 195 300 225 268 258"/><path class="dw" d="M135 462 C170 430 195 360 222 318"/></g></svg>
+          <div class="disc"></div>
+          <div class="owl" id="owl">
+            <svg viewBox="0 0 120 120" aria-hidden="true" id="zukko">
+              <ellipse cx="60" cy="112" rx="30" ry="5" fill="rgba(11,16,56,.25)"/>
+              <path d="M26 62 C10 70 12 92 30 98 C30 84 32 72 26 62Z" fill="#2E3597"/><path d="M94 62 C110 70 108 92 90 98 C90 84 88 72 94 62Z" fill="#2E3597"/>
+              <path d="M60 18 C88 18 98 40 98 66 C98 92 82 106 60 106 C38 106 22 92 22 66 C22 40 32 18 60 18Z" fill="#5560D6"/>
+              <path d="M60 52 C78 52 84 66 84 80 C84 96 74 102 60 102 C46 102 36 96 36 80 C36 66 42 52 60 52Z" fill="#E9EEFF"/>
+              <path d="M50 80 q5 4 10 0 q5 4 10 0 M46 90 q7 5 14 0 q7 5 14 0" stroke="#B8C2F2" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M36 26 L30 10 L48 22Z" fill="#5560D6"/><path d="M84 26 L90 10 L72 22Z" fill="#5560D6"/>
+              <circle cx="44" cy="46" r="15" fill="#fff"/><circle cx="76" cy="46" r="15" fill="#fff"/>
+              <g id="pupils"><circle cx="45" cy="47" r="6.5" fill="#0B1038"/><circle cx="77" cy="47" r="6.5" fill="#0B1038"/><circle cx="47" cy="45" r="2" fill="#fff"/><circle cx="79" cy="45" r="2" fill="#fff"/></g>
+              <ellipse class="lid" cx="44" cy="46" rx="15.5" ry="15.5" fill="#5560D6"/><ellipse class="lid" cx="76" cy="46" rx="15.5" ry="15.5" fill="#5560D6"/>
+              <path d="M55 56 L65 56 L60 66Z" fill="#2DE2C4"/>
+              <circle cx="34" cy="60" r="5" fill="#B79CFF" opacity=".7"/><circle cx="86" cy="60" r="5" fill="#B79CFF" opacity=".7"/>
+            </svg>
+          </div>
+          <div class="chip c1"><small data-i18n="chipQ">Which is bigger?</small><b>3/4 <i>&gt;</i> 2/3</b></div>
+          <div class="chip c2"><b id="chip24">24</b><span data-i18n="chipOf">of 35 understood</span></div>
+          <div class="chip c3" data-i18n="chipHint">Hint 2: cut both into 12 equal pieces.</div>
+          <div class="chip c4" data-i18n="chipSample">Sample data</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 the question: an anamorphic sculpture of slats, resolved by scrolling -->
+    <section class="sec anam" id="question" data-ch="1" data-theme="dark">
+      <div class="anam-run" id="anRun">
+        <div class="anam-pin">
+          <div class="wrap">
+            <h2 class="rv lead-big" data-i18n="anLead">How do we build tomorrow?</h2>
+          </div>
+          <div class="anam-stage" id="anStage"><canvas id="anCanvas" aria-hidden="true"></canvas></div>
+          <div class="wrap">
+            <p class="anam-saying" id="anSaying" data-i18n="anSaying">today’s learners with tomorrow’s guidance—where teachers, AI, and global knowledge light the path forward.</p>
+            <div class="anam-controls">
+              <div class="ctl-label"><span data-i18n="anView">A question of perspective</span><span id="anAngle" aria-hidden="true">0°</span></div>
+              <input id="anRange" type="range" aria-label="Change your viewpoint" />
+              <div class="ctl-btns"><button type="button" class="pill on" id="anResolve" aria-pressed="true" data-i18n="anResolve">Resolve the word</button><button type="button" class="pill" id="anChange"><span data-i18n="anChange">Change perspective</span> ↗</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="anam-foot">
+          <p class="anam-q"><span data-i18n="anSame1">Different perspectives.</span><br><span data-i18n="anSame2">One shared vision.</span></p>
+        </div>
+        <span class="credit" data-i18n="anCredit">An anamorphic sculpture of slats, each at a different depth.</span>
+      </div>
+    </section>
+
+    <!-- the film: it arrives through a wall of slats right after the CONNECT chapter -->
+    <section class="sec film" id="film" data-ch="2" data-theme="dark">
+      <div class="film-run" id="filmRun">
+        <div class="film-pin" id="filmPin">
+          <h2 class="rv film-title" id="filmTitle" data-i18n="filmTitle">The whole idea in 1:47.</h2>
+          <div class="film-stage" id="filmStage">
+            <div class="vframe" id="vframe">
+              <video id="vid" playsinline preload="metadata" controls poster="media/film-poster.jpg">
+                <source src="media/film-720.mp4" type="video/mp4" />
+                <track kind="captions" src="media/film.vtt" srclang="en" label="English" />
+              </video>
+              <div class="vshade" id="vshade"></div>
+              <button class="play" id="play" aria-label="Play"><svg viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="48"/><path d="M39 30l30 18-30 18z"/></svg></button>
+            </div>
+            <div class="slats" id="slats" aria-hidden="true"></div>
+          </div>
+          <p class="note film-note" id="filmNote" data-i18n="capNote">The pitch film, with English voice-over and captions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 the loop -->
+    <section class="sec white" id="loop" data-ch="1">
+      <div class="wrap">
+        <h2 class="rv" data-i18n="loopTitle">Check. Hint. Report.</h2>
+        <p class="sub" data-i18n="loopSub">The loop after every lesson. The teacher stays in charge of what happens next.</p>
+        <div class="cards3">
+          <article class="card c-mint"><div class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 21 L17 30 L33 10" stroke="#0B1038" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3 data-i18n="c1t">Check</h3><p data-i18n="c1d">A short quiz after the lesson. Every student answers on their own phone.</p></article>
+          <article class="card c-lilac"><div class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M5 34 H15 V24 H25 V14 H35" stroke="#0B1038" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3 data-i18n="c2t">Hint</h3><p data-i18n="c2d">Stuck? Zukko gives a smaller step, then another. Hints come before answers.</p></article>
+          <article class="card c-blue"><div class="ico"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 34 V22 M17 34 V12 M26 34 V18 M35 34 V6" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/></svg></div><h3 data-i18n="c3t">Report</h3><p data-i18n="c3d">The teacher sees who understood, and the question most of the class missed.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 how Zukko thinks: the AI hub -->
+    <section class="sec black" id="brain" data-ch="2" data-theme="dark">
+      <div class="wrap">
+        <span class="pill-badge dark" data-i18n="brainTag">Under the hood</span>
+        <h2 class="rv big" data-i18n-rich="brainTitle">The teacher teaches. *The AI fills the gaps.*</h2>
+        <p class="sub" data-i18n="brainBody">Six connected systems. Teachers make quizzes with AI and launch them by QR code, run ready-made classroom games, set homework and take attendance from a photo count.</p>
+      </div>
+      <div class="hubwrap"><div id="hub" class="hub"></div><div id="hub2" class="hub"></div></div>
+      <div class="wrap"><p class="note" data-i18n="brainNote">Sample run with sample names.</p></div>
+    </section>
+
+    <!-- 04 two ages -->
+    <section class="sec blue" id="ages" data-ch="3" data-theme="dark">
+      <div class="wrap two">
+        <div class="col">
+          <h2 class="rv" data-i18n="agesTitle">Two ages. Two ways to touch the lesson.</h2>
+          <p class="sub lit" data-i18n="agesBody">Grades 1 to 4 walk through a bazaar and learn fractions by cutting real things. Grades 5 to 11 move the picture: drag a slider and watch the line turn.</p>
+          <div class="tags"><span class="tag mint" data-i18n="g14">Grades 1 to 4</span><span class="tag lilac" data-i18n="g511">Grades 5 to 11</span></div>
+        </div>
+        <div class="phones">
+          <div class="phone ph1"><img id="ph1" alt="The Grade 4 bazaar map" /></div>
+          <div class="phone ph2"><img id="ph2" alt="A linear function lesson with sliders" /></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 hints -->
+    <section class="sec lilac" id="hints" data-ch="4">
+      <div class="wrap two">
+        <div class="hintbox" id="hintbox">
+          <div class="zrow">
+            <div class="mini-owl" id="miniOwl"></div>
+            <div class="bubble"><b data-i18n="hintN2">Hint 2</b> · <span data-i18n="hint2">Cut both into 12 equal pieces. Which has more?</span></div>
+          </div>
+          <div class="fr"><div class="fcell">3/4</div><div class="fcell">2/3</div></div>
+          <div class="bars" id="bars" aria-hidden="true"></div>
+          <div class="cutlbl"><span id="lblA">3/4</span><span id="lblB">2/3</span></div>
+          <div class="slider">
+            <div class="srow"><span data-i18n="tryCut">Try it: drag to cut into equal pieces</span><b id="pcs">12 pieces</b></div>
+            <input id="cut" type="range" min="0" max="4" step="1" value="4" aria-label="Pieces" />
+            <div class="stops"><span>2</span><span>3</span><span>4</span><span>6</span><span>12</span></div>
+            <p class="cutmsg" id="cutmsg" role="status"></p>
+          </div>
+        </div>
+        <div class="col">
+          <h2 class="rv" data-i18n="hintsTitle">Hints, not answers.</h2>
+          <p class="sub lit" data-i18n="hintsBody">Zukko never hands over the answer.</p>
+          <div class="steps3"><span class="st ink" data-i18n="hintN1">Hint 1</span><span class="st blue" data-i18n="hintN2">Hint 2</span><span class="st mint" data-i18n="hintN3">Hint 3</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 teacher report -->
+    <section class="sec ink" id="report" data-ch="5" data-theme="dark">
+      <div class="wrap two">
+        <div class="col">
+          <h2 class="rv" data-i18n-rich="repTitle">The teacher sees where it broke*.*</h2>
+          <p class="sub lit" data-i18n="repBody">One report for the whole class.</p>
+        </div>
+        <div class="window">
+          <div class="win-head"><b data-i18n="classTitle">Class 7-B · Linear function</b><span class="samp" data-i18n="sampleData">Sample data</span></div>
+          <div class="report-grid" id="reportGrid" role="table"></div>
+          <div class="missed"><b>Q4</b><span data-i18n="missedQ">Most missed. Four of seven students got it wrong.</span></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- the school message: what the product really is (the old globe chapter is gone, only its text is kept) -->
+    <section class="sec deep" id="school" data-ch="7" data-theme="dark">
+      <div class="wrap">
+        <span class="pill-badge dark" data-i18n="mapTag">The plan for every school</span>
+        <h2 class="rv big" data-i18n-rich="mapTitle">Telegram is the demo. *The school is the product.*</h2>
+        <p class="sub" data-i18n="mapBody">In production, every school gets its own server.</p>
+        <div class="plan-row"><span class="tag plan" data-i18n="tPlan">Planned: not built yet</span><b class="lens-t" data-i18n="lensTitle">A server in the school. Its own Wi-Fi. AI inside the building.</b></div>
+      </div>
+    </section>
+
+    <!-- 09 try it -->
+    <section class="sec mint try" id="try" data-ch="8">
+      <div class="wrap try-row">
+        <div class="owl2" id="owl2"></div>
+        <div class="try-copy">
+          <h2 class="rv huge" data-i18n="tryTitle">Try it now.</h2>
+          <p class="sub" data-i18n="tryBody">Open the bot in Telegram. Grades 6 to 7, 23 textbook topics.</p>
+          <a class="btn ink" id="cta-bot" href="#" target="_blank" rel="noopener" data-i18n="ctaBot">Open the bot</a>
+        </div>
+        <div class="qr" id="qr" role="img" aria-label="QR code"></div>
+      </div>
+    </section>
+    <footer class="foot" data-i18n="foot">A prototype for UzHack.</footer>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
