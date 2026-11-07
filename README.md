@@ -138,3 +138,7 @@ Current words on the picture (the user own copy, English kept as written, each s
 Live flow has no big container behind each system any more (the bordered band was removed); each row keeps only a small header (number, name, status). Every box moves on its own in the tab switch, one after another in a queue (left and top first), with a step of 0.03 to 0.1 s between boxes depending on how many there are.
 
 The lines now end exactly on the edge of each box (and start on the edge of each input chip); they used to stop 8 px short because of the small circles that were removed earlier.
+
+When the AI hub is first scrolled into view, everything arrives one box after another (the left chips, the two panels, Zukko and the lines first, then the boxes of the open tab), each fading in and growing from smaller; then the opening plays. Until then nothing in the hub is visible. It does not replay when you scroll away and come back (press a tab to replay).
+
+Correction: the hub arrival replays every time you scroll back into the section (if you were away for more than about a second), starting from nothing and playing the opening again. It is not first-time-only.

@@ -638,10 +638,13 @@ export function createHub(root, rootM, { reduced }) {
   const tabs = $$('.hb-tab');
   /* getting a view ready: every box is put back to its pending slot, the lines go faint, the left side dims */
   const killNode = (e) => gsap.killTweensOf([e, ...e.querySelectorAll('*')]);
-  const prepare = (v) => {
-    if (v === 'C') { restoreLeft(); return; }
+  const prepareBoxes = (v) => {
     Object.values(N).filter((n) => n.view === v).forEach((n) => { const e = el[n.id]; if (e) killNode(e); setPending(n.id); });
     const wg = $$('.wg', views[v]); gsap.killTweensOf(wg); gsap.set(wg, { opacity: 0.12 });
+  };
+  const prepare = (v) => {
+    if (v === 'C') { restoreLeft(); return; }
+    prepareBoxes(v);
     gsap.to(panelEls, { opacity: 0.2, duration: 0.4, overwrite: 'auto' }); gsap.to(inputEls, { opacity: 0.4, boxShadow: '0 0 0 rgba(0,0,0,0)', duration: 0.4, overwrite: 'auto' }); gsap.to(leftWires, { opacity: 0.18, duration: 0.4, overwrite: 'auto' });
   };
   /* the way the boxes leave and arrive. Every box moves on its own: a box recedes (fades, shrinks, drifts up) and a new one
@@ -688,11 +691,28 @@ export function createHub(root, rootM, { reduced }) {
   };
   tabs.forEach((t) => t.addEventListener('click', () => setView(t.dataset.tab)));
 
+  /* every time the section is scrolled into view (after being away for a moment), everything arrives the same way: every box fades in and grows,
+     one after another (the input chips, the two panels, Zukko and the lines too), then the opening plays */
+  let entered = false, leftAt = 0;
+  const firstEntry = () => {
+    entered = true; introDone[view] = false; loopTok++; /* every time the section is entered it plays from the beginning */
+    const v = views[view], C = view === 'C';
+    gsap.killTweensOf([v.children[0], ...itemsOf(v)]); gsap.set([v.children[0], ...itemsOf(v)], { opacity: 0 }); // the boxes of the last visit go at once
+    if (!C) prepareBoxes(view);
+    const left = [...inputEls, ...panelEls];
+    gsap.set(leftWires, { opacity: C ? 1 : 0.18 });
+    gsap.fromTo(svgL, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power1.out' });
+    gsap.fromTo(left, { opacity: 0, ...AWAY }, { opacity: (i) => (C ? 1 : i < inputEls.length ? 0.4 : 0.2), y: 0, scale: 1, duration: 0.62, ease: 'power3.out', stagger: 0.08, clearProps: 'transform' });
+    later(0.5, () => arrive(v));
+    if (C) showDone();
+    later(1.5, startView);
+  };
+  if (!reduced) { const v0 = views[view]; gsap.set([svgL, ...inputEls, ...panelEls, v0.children[0], ...itemsOf(v0)], { opacity: 0 }); } // nothing shows before the section is reached
   const io = new IntersectionObserver((es) => {
     es.forEach((e) => {
       if (e.target === root.parentElement) {
-        if (e.isIntersecting) { if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } countUp(); if (!reduced && !alive && getComputedStyle(root).display !== 'none') { alive = true; later(0.6, startView); } }
-        else { running = false; alive = false; calls.splice(0).forEach((c) => c.kill()); unfocus(); restoreLeft(); }
+        if (e.isIntersecting) { if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } countUp(); if (!reduced && !alive && getComputedStyle(root).display !== 'none') { alive = true; if (!entered || performance.now() - leftAt > 900) firstEntry(); else later(0.6, startView); } }
+        else { running = false; alive = false; leftAt = performance.now(); calls.splice(0).forEach((c) => c.kill()); if (entered) { unfocus(); restoreLeft(); } /* before the first entry nothing may be shown yet */ }
       }
     });
   }, { threshold: 0.05 });
