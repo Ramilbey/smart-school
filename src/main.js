@@ -10,6 +10,7 @@ import { createHub } from './hub.js';
 import { createHeroGlobe } from './herogl.js';
 import { createFilm } from './film.js';
 import { createAnamorph } from './anamorph.js';
+import { createShapes } from './shapes.js';
 import { BOT_URL, T } from './i18n.js';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -24,10 +25,7 @@ let introDone = false;
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
 /* ---------- language ---------- */
-const store = { get: () => { try { return localStorage.getItem('ss-lang'); } catch { return null; } }, set: (v) => { try { localStorage.setItem('ss-lang', v); } catch { /* ignore */ } } };
-const guess = () => { const l = (navigator.language || 'en').slice(0, 2); return T[l] ? l : 'en'; };
-let lang = new URLSearchParams(location.search).get('lang') || store.get() || guess();
-if (!T[lang]) lang = 'en';
+const lang = 'en'; // the site is in English only
 
 /* ---------- Zukko, drawn once and reused ---------- */
 const owlSvg = ({ body = '#5560D6', wing = '#2E3597', happy = false, look = [0, 0], shadow = true } = {}) => `<svg viewBox="0 0 120 120" aria-hidden="true">${shadow ? '<ellipse cx="60" cy="112" rx="30" ry="5" fill="rgba(11,16,56,.25)"/>' : ''}<path d="M26 62 C10 70 12 92 30 98 C30 84 32 72 26 62Z" fill="${wing}"/><path d="M94 62 C110 70 108 92 90 98 C90 84 88 72 94 62Z" fill="${wing}"/><path d="M60 18 C88 18 98 40 98 66 C98 92 82 106 60 106 C38 106 22 92 22 66 C22 40 32 18 60 18Z" fill="${body}"/><path d="M60 52 C78 52 84 66 84 80 C84 96 74 102 60 102 C46 102 36 96 36 80 C36 66 42 52 60 52Z" fill="#E9EEFF"/><path d="M50 80 q5 4 10 0 q5 4 10 0 M46 90 q7 5 14 0 q7 5 14 0" stroke="#B8C2F2" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M36 26 L30 10 L48 22Z" fill="${body}"/><path d="M84 26 L90 10 L72 22Z" fill="${body}"/><circle cx="44" cy="46" r="15" fill="#fff"/><circle cx="76" cy="46" r="15" fill="#fff"/>${happy ? '<path d="M36 48 q8 -9 16 0" stroke="#0B1038" stroke-width="4.5" fill="none" stroke-linecap="round"/><path d="M68 48 q8 -9 16 0" stroke="#0B1038" stroke-width="4.5" fill="none" stroke-linecap="round"/>' : `<circle cx="${45 + look[0]}" cy="${47 + look[1]}" r="6.5" fill="#0B1038"/><circle cx="${77 + look[0]}" cy="${47 + look[1]}" r="6.5" fill="#0B1038"/><circle cx="${47 + look[0]}" cy="${45 + look[1]}" r="2" fill="#fff"/><circle cx="${79 + look[0]}" cy="${45 + look[1]}" r="2" fill="#fff"/>`}<path d="M55 56 L65 56 L60 66Z" fill="#2DE2C4"/><circle cx="34" cy="60" r="5" fill="#B79CFF" opacity=".7"/><circle cx="86" cy="60" r="5" fill="#B79CFF" opacity=".7"/></svg>`;
@@ -107,15 +105,11 @@ function setCut(animate = true) {
 }
 cutIn.addEventListener('input', () => setCut(true));
 
-function applyLang(next) {
-  lang = next;
-  store.set(lang);
+function applyLang() {
   document.documentElement.lang = lang;
   $$('[data-i18n]:not(.rv)').forEach((el) => { const v = T[lang][el.dataset.i18n]; if (v != null) el.textContent = v; });
   $$('.rv').forEach(renderRV);
-  $$('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
-  const shot = lang === 'uz' ? 'uz' : 'en';
-  $('#ph1').src = `shots/${shot}-bazaar.jpg`; $('#ph2').src = `shots/${shot}-line.jpg`;
+  $('#ph1').src = 'shots/en-bazaar.jpg'; $('#ph2').src = 'shots/en-line.jpg';
   renderReport(); setCut(false); litWords();
   if (typeof anText === 'function') { anText(); wrapSaying(); }
   if (typeof anamP !== 'undefined' && T[lang].anWord !== anWordNow) { anWordNow = T[lang].anWord; anamP.then((a) => a?.setWord(anWordNow)); }
@@ -137,6 +131,8 @@ const hgWords = $$('#hgCopy p'), hgDim = $('#hgDim');
 if (!reduced) { try { hg = createHeroGlobe(hgCv, { reduced }); } catch (e) { document.body.classList.add('hg-fallback'); } }
 /* the film chapter: the slats, the opening of the blinds and the growing frame (see film.js) */
 const filmRun = $('#filmRun');
+/* the shapes chapter: the original hand-figure app in a frame, with a voice (see shapes.js) */
+createShapes($('#shapes'), { reduced });
 const film = createFilm({ pin: $('#filmPin'), stage: $('#filmStage'), wall: $('#slats'), title: $('#filmTitle'), note: $('#filmNote'), shade: $('#vshade'), video: $('#vid') }, { reduced });
 let filmP = 0, filmE = 0, filmT = performance.now();
 const sm = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -187,8 +183,7 @@ if (reduced) {
   $('#skip').addEventListener('click', finishBoot);
   addEventListener('keydown', (e) => { if (e.key === 'Escape') finishBoot(); });
 }
-applyLang(lang);
-$$('.lang button').forEach((b) => b.addEventListener('click', () => applyLang(b.dataset.lang)));
+applyLang();
 
 /* ---------- Zukko comes alive ---------- */
 const heroSet = [];
@@ -238,7 +233,7 @@ addEventListener('resize', () => { measure(); hub.fit(); hg && hg.resize(); Scro
 addEventListener('load', () => { measure(); hub.fit(); ScrollTrigger.refresh(); });
 document.fonts?.ready.then(() => { measure(); hub.fit(); ScrollTrigger.refresh(); });
 
-const DARK = ['hero', 'film', 'black', 'blue', 'ink', 'deep', 'anam'];
+const DARK = ['hero', 'film', 'black', 'blue', 'ink', 'deep', 'anam', 'shapes'];
 let tNow = 0;
 function tick(now) {
   tNow = now / 1000;

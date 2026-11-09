@@ -38,10 +38,6 @@ body.booting .top, body.booting .chbar { opacity: 0; }
 .menu a { white-space: nowrap; text-decoration: none; opacity: 0.8; transition: opacity 0.2s; }
 .menu a:hover { opacity: 1; }
 .top-right { display: flex; align-items: center; gap: 16px; }
-.lang { display: flex; gap: 2px; }
-.lang button { border: 0; background: none; color: inherit; font: 700 13px var(--g); padding: 6px 8px; border-radius: 8px; opacity: 0.55; cursor: pointer; }
-.lang button[aria-pressed='true'] { opacity: 1; background: rgba(59, 75, 255, 0.14); }
-.top.dark .lang button[aria-pressed='true'] { background: rgba(255, 255, 255, 0.16); }
 
 .chbar { position: fixed; z-index: 40; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(780px, calc(100% - 28px)); display: flex; align-items: center; gap: 18px; padding: 10px 12px 10px 24px; border-radius: 99px; background: var(--ink); color: #e9eeff; font-size: 14.5px; font-weight: 600; box-shadow: 0 5px 0 #1c2580, 0 18px 40px rgba(11, 16, 56, 0.28); transition: opacity 0.5s; }
 .chl { color: #8d99cc; }
@@ -276,7 +272,6 @@ input[type='range']::-moz-range-thumb { width: 18px; height: 18px; border-radius
 }
 @media (max-width: 640px) {
   .brand span { display: none; }
-  .lang button { padding: 6px 5px; }
   .btn { height: 54px; font-size: 16px; padding: 0 22px; }
   .btn.sm { height: 42px; font-size: 14px; padding: 0 14px; }
   .chl, .ticks, .motion { display: none; }
@@ -372,3 +367,92 @@ body.still .film-run { height: 100vh; }
 body.still .hg-copy p, body.hg-fallback .hg-copy p { opacity: 0; transform: none; }
 body.still .hg-copy p:first-child, body.hg-fallback .hg-copy p:first-child { opacity: 1; }
 body.still .hg-dim, body.hg-fallback .hg-dim { opacity: 0.9; }
+
+/* ---------- shapes you can hold: a scroll story, then the hand-figure app in a frame, with a voice ---------- */
+.sec.shapes { background: #0a0e12; color: #e9eeff; padding: 0; }
+.sh-run { position: relative; height: 560vh; }
+.sh-pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; contain: layout paint; background: radial-gradient(ellipse 60% 50% at 78% 52%, rgba(24, 35, 90, 0.55), rgba(10, 14, 18, 0) 70%); }
+
+/* the story: words on the left, a page from a textbook on the right */
+.sh-story { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr); align-items: center; gap: 4vw; max-width: 1240px; margin: 0 auto; padding: 0 var(--pad); perspective: 1500px; }
+.sh-copy { display: grid; }
+.sh-copy .beat { grid-area: 1 / 1; align-self: center; }
+.sh-copy .ln { display: block; overflow: hidden; padding-bottom: 0.14em; margin-bottom: -0.14em; text-wrap: balance; }
+.sh-copy .ln > span { display: block; will-change: transform; }
+.sh-hook { font: 800 clamp(34px, 6vw, 88px) / 1.03 var(--u); letter-spacing: -0.05em; color: #fff; }
+.sh-hook .ln:first-child { color: #aab1c0; }
+.sh-q { font: 800 clamp(24px, 3.5vw, 54px) / 1.12 var(--u); letter-spacing: -0.045em; color: #fff; text-wrap: balance; }
+.sh-q .ln:first-child { color: #aab1c0; }
+.sh-follow { display: flex; align-items: center; gap: 12px; margin-top: clamp(18px, 3.4vh, 34px); font: 700 clamp(20px, 2.5vw, 34px) var(--u); letter-spacing: -0.035em; color: var(--mint); }
+.sh-follow svg { width: clamp(24px, 2.6vw, 34px); height: auto; flex: none; animation: shBob 1.5s ease-in-out infinite; }
+@keyframes shBob { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(5px); } }
+
+/* the textbook page with the drawing of a cube */
+.sh-page { justify-self: center; width: min(100%, 340px); aspect-ratio: 300 / 380; border-radius: 16px; background: #eef1ff; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55); will-change: transform, opacity; }
+.sh-page svg { display: block; width: 100%; height: 100%; font-family: var(--g); }
+.sh-page .draw { stroke-dasharray: 1; stroke-dashoffset: 0; }
+
+/* the lab: heading, the frame with the original app, the numbers of the shape */
+.sh-lab { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: clamp(10px, 2vh, 20px); max-width: 1240px; margin: 0 auto; padding: clamp(72px, 10vh, 100px) var(--pad) clamp(14px, 3vh, 28px); pointer-events: none; }
+.sh-lab.on { pointer-events: auto; }
+.sh-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.sh-h2 { font: 800 clamp(26px, 3.8vw, 48px) var(--u); letter-spacing: -0.045em; color: #fff; }
+.sh-h2 span { color: #7d8bff; }
+.sh-stage { position: relative; min-height: 0; border-radius: 26px; overflow: hidden; border: 1px solid rgba(233, 238, 255, 0.1); background: radial-gradient(ellipse 70% 80% at 50% 42%, #18235a 0%, #0d1236 55%, #05060a 100%); will-change: transform; }
+.sh-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #05060a; }
+.sh-cap { position: absolute; left: 50%; top: 14px; z-index: 3; transform: translateX(-50%); width: max-content; max-width: min(720px, 92%); padding: 10px 18px; border-radius: 14px; background: rgba(10, 14, 18, 0.82); font-size: clamp(14px, 1.6vw, 17px); line-height: 1.4; text-align: center; color: #e9eeff; opacity: 0; pointer-events: none; transition: opacity 0.35s; }
+.sh-cap.on { opacity: 1; }
+.sh-ask { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; }
+.sh-ask.gone { display: none; }
+.sh-ask-t { max-width: 600px; font-weight: 600; font-size: clamp(16px, 2vw, 22px); line-height: 1.4; color: #fff; }
+.sh-ask-b { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+.sh-ask .btn { height: 54px; font-size: 16px; }
+.sh-priv { font-size: 14px; color: #9aa6d8; }
+.sh-info { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 32px; align-items: end; }
+.sh-solid { min-height: 84px; }
+.sh-solid h3 { font: 800 clamp(22px, 3vw, 32px) var(--u); letter-spacing: -0.04em; color: #fff; }
+.sh-nums { display: flex; flex-wrap: wrap; gap: 8px clamp(16px, 3vw, 36px); margin: 6px 0 0; }
+.sh-nums[hidden] { display: none; }
+.sh-nums dt { font-size: 14px; color: #9aa6d8; }
+.sh-nums dd { margin: 0; font: 800 clamp(22px, 2.6vw, 30px) var(--u); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.sh-euler { min-height: 1.4em; margin-top: 4px; font: 700 clamp(15px, 1.8vw, 20px) var(--u); letter-spacing: -0.03em; color: var(--mint); }
+.sh-ctl { display: grid; gap: 10px; justify-items: end; max-width: 360px; }
+.sh-hint { font-size: 14px; line-height: 1.45; color: #9aa6d8; text-align: right; }
+.sh-btns { display: flex; gap: 8px; }
+.sh-btn { height: 42px; padding: 0 14px; border-radius: 12px; border: 2px solid rgba(233, 238, 255, 0.18); background: none; color: #e9eeff; font: 600 14px var(--g); cursor: pointer; transition: border-color 0.15s; }
+.sh-btn:hover { border-color: rgba(233, 238, 255, 0.45); }
+.sh-btn[hidden] { display: none; }
+.sh-btn[aria-pressed='true'] { color: #9aa6d8; }
+
+@media (max-width: 900px) {
+  .sh-run { height: 500vh; }
+  .sh-story { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: center; gap: 2vh; padding-top: 88px; padding-bottom: 20px; }
+  .sh-page { grid-row: 1; width: auto; height: 100%; max-height: 40svh; justify-self: center; }
+  .sh-copy { grid-row: 2; align-self: start; }
+  .sh-hook { font-size: clamp(32px, 9.4vw, 56px); }
+  .sh-q { font-size: clamp(22px, 6.2vw, 36px); }
+  .sh-lab { padding-top: 66px; gap: 8px; }
+  .sh-info { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .sh-ctl { justify-items: start; }
+  .sh-hint { text-align: left; }
+  .sh-solid { min-height: 0; }
+  .sh-solid h3 { font-size: 22px; }
+  .sh-nums dd { font-size: 20px; }
+  .sh-nums { gap: 4px 18px; margin-top: 4px; }
+  .sh-ask .btn { height: 48px; font-size: 15px; padding: 0 18px; }
+  .sh-priv { font-size: 12px; }
+}
+@media (max-height: 720px) and (min-width: 901px) {
+  .sh-lab { padding-top: 64px; gap: 8px; }
+  .sh-priv { display: none; }
+}
+
+/* motion off: no pinned scrolling; the story and the lab are laid out one after the other */
+body.still .sh-run { height: auto; }
+body.still .sh-pin { position: static; height: auto; overflow: visible; contain: none; }
+body.still .sh-story { position: relative; inset: auto; padding-top: 110px; padding-bottom: 60px; }
+body.still .sh-copy .beat { grid-area: auto; }
+body.still .sh-copy { gap: 44px; }
+body.still .sh-lab { position: relative; inset: auto; min-height: 100svh; pointer-events: auto; }
+body.still .sh-follow svg { animation: none; }
+@media (max-width: 900px) { body.still .sh-story { grid-template-rows: auto auto; } body.still .sh-page { height: auto; width: min(70%, 280px); } }

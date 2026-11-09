@@ -27,9 +27,8 @@
       </svg>
       <span>Smart Schools</span>
     </a>
-    <nav class="menu" aria-label="Main"><a href="#loop" data-i18n="nav1">How it works</a><a href="#brain" data-i18n="nav2">Zukko's AI</a><a href="#report" data-i18n="nav3">For teachers</a><a href="#film" data-i18n="nav4">The film</a></nav>
+    <nav class="menu" aria-label="Main"><a href="#loop" data-i18n="nav1">How it works</a><a href="#brain" data-i18n="nav2">Zukko's AI</a><a href="#report" data-i18n="nav3">For teachers</a><a href="#film" data-i18n="nav4">The film</a><a href="./teacher.html" data-i18n="nav5">Teacher login</a></nav>
     <div class="top-right">
-      <div class="lang" role="group" aria-label="Language"><button data-lang="uz">UZ</button><button data-lang="ru">RU</button><button data-lang="en">EN</button></div>
       <a class="btn sm blue" id="cta-top" href="#" target="_blank" rel="noopener" data-i18n="ctaTop">Try it in Telegram</a>
     </div>
   </header>
@@ -163,6 +162,89 @@
         <div class="phones">
           <div class="phone ph1"><img id="ph1" alt="The Grade 4 bazaar map" /></div>
           <div class="phone ph2"><img id="ph2" alt="A linear function lesson with sliders" /></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- shapes you can hold: a scroll story (a hook, a question, a follow-up), then the original hand-figure app in a frame, with a voice (src/shapes.js) -->
+    <section class="sec shapes" id="shapes" data-ch="4" data-theme="dark">
+      <div class="sh-run" id="shRun">
+        <div class="sh-pin" id="shPin">
+
+          <div class="sh-story" id="shStory">
+            <div class="sh-copy">
+              <div class="beat beat-a">
+                <p class="sh-hook" id="shHook"><span class="ln"><span>A cube on paper</span></span><span class="ln"><span>isn’t a cube.</span></span></p>
+              </div>
+              <div class="beat beat-q">
+                <h2 class="sh-q" id="shQ"><span class="ln"><span>With the Smart Schools system,</span></span><span class="ln"><span>how would students learn shapes in geometry?</span></span></h2>
+                <p class="sh-follow" id="shFollow"><span>Care to check it out?</span>
+                  <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 12 L16 21 L25 12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+              </div>
+            </div>
+            <div class="sh-page" id="shPage" aria-hidden="true">
+              <svg viewBox="0 0 300 380" role="img">
+                <path d="M80 160 L124 116 L224 116 L180 160 Z" fill="rgba(120,212,255,.26)"/>
+                <path d="M180 160 L224 116 L224 216 L180 260 Z" fill="rgba(59,75,255,.14)"/>
+                <path d="M80 160 L180 160 L180 260 L80 260 Z" fill="rgba(45,226,196,.3)"/>
+                <g fill="none" stroke="#0b1038" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path class="draw" pathLength="1" d="M80 160 Q130 158.4 180 160"/>
+                  <path class="draw" pathLength="1" d="M180 160 Q181.4 210 180 260"/>
+                  <path class="draw" pathLength="1" d="M180 260 Q130 261.6 80 260"/>
+                  <path class="draw" pathLength="1" d="M80 260 Q78.6 210 80 160"/>
+                  <path class="draw" pathLength="1" d="M80 160 Q101 137 124 116"/>
+                  <path class="draw" pathLength="1" d="M124 116 Q174 114.6 224 116"/>
+                  <path class="draw" pathLength="1" d="M180 160 Q203 138 224 116"/>
+                  <path class="draw" pathLength="1" d="M224 116 Q225.4 166 224 216"/>
+                  <path class="draw" pathLength="1" d="M180 260 Q203 238 224 216"/>
+                </g>
+                <g class="hid" fill="none" stroke="#0b1038" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 8">
+                  <path d="M124 116 L124 216"/><path d="M124 216 L224 216"/><path d="M80 260 L124 216"/>
+                </g>
+                <text class="note" x="36" y="46" fill="#5560a8" font-size="13" font-weight="600">Geometry</text>
+                <text class="note" x="264" y="46" fill="#5560a8" font-size="13" font-weight="600" text-anchor="end">47</text>
+                <text class="note" x="36" y="326" fill="#0b1038" font-size="15"><tspan font-weight="800">Fig. 3</tspan><tspan dx="10">A cube</tspan></text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="sh-lab" id="shLab">
+            <div class="sh-head">
+              <span class="pill-badge dark">Geometry, in your hands</span>
+              <h2 class="sh-h2">Shapes you can <span>hold.</span></h2>
+            </div>
+            <div class="sh-stage" id="shStage">
+              <p class="sh-cap" id="shCap" aria-live="polite"></p>
+              <div class="sh-ask" id="shAsk">
+                <p class="sh-ask-t" data-i18n="shAsk">Raise a hand and show three fingers. Your other hand makes the shape bigger, smaller, and spins it.</p>
+                <div class="sh-ask-b">
+                  <button type="button" class="btn blue" id="shStart" data-i18n="shStart">Turn on camera and voice</button>
+                  <button type="button" class="btn white" id="shDemo" data-i18n="shDemo">No camera? Watch the demo</button>
+                </div>
+                <p class="sh-priv" data-i18n="shPrivacy">The camera stays in your browser. Nothing is recorded or sent anywhere.</p>
+              </div>
+            </div>
+            <div class="sh-info">
+              <div class="sh-solid">
+                <h3 id="shName" aria-live="polite"></h3>
+                <dl class="sh-nums" id="shNums" hidden>
+                  <div><dt data-i18n="shLblBase">Base sides</dt><dd id="shBase"></dd></div>
+                  <div><dt data-i18n="shLblFaces">Faces</dt><dd id="shFaces"></dd></div>
+                  <div><dt data-i18n="shLblEdges">Edges</dt><dd id="shEdges"></dd></div>
+                  <div><dt data-i18n="shLblVerts">Vertices</dt><dd id="shVerts"></dd></div>
+                </dl>
+                <p class="sh-euler" id="shEuler" aria-live="polite"></p>
+              </div>
+              <div class="sh-ctl">
+                <p class="sh-hint" data-i18n="shHint">First hand: fingers pick the shape (0 to 5). Other hand: pinch or open to resize, flick to spin.</p>
+                <div class="sh-btns">
+                  <button type="button" class="sh-btn" id="shStop" hidden data-i18n="shStop">Turn off camera</button>
+                  <button type="button" class="sh-btn" id="shMute" aria-pressed="false">Voice on</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

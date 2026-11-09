@@ -1,6 +1,6 @@
 # Smart Schools website
 
-A one-page site for the UzHack prototype. Light and playful, built around **Zukko**, the owl from the app. It opens with the approved Smart Schools loading animation (counting 000 to 100), then scrolls through nine chapters. Headlines rise out of a mask and words light up as you scroll.
+A one-page site for the UzHack prototype, plus a teacher portal and a student play page (below). Light and playful, built around **Zukko**, the owl from the app. It opens with the approved Smart Schools loading animation (counting 000 to 100), then scrolls through nine chapters. Headlines rise out of a mask and words light up as you scroll.
 
 Frames (approved): the Design canvas "Smart Schools landing, best-in-class" (https://claude.ai/artifact/S15JXgSaYcxP9mEVonbjQa).
 
@@ -15,16 +15,69 @@ npm run dev        # http://localhost:5190
 Open http://localhost:5190 in Chrome and scroll. Useful switches:
 
 - `?still=1`: all motion off (same as the reduced-motion setting or the reduced-motion setting); skips the opening.
-- `?lang=uz` or `?lang=ru`: change language (also top right).
 - Skip the opening with the Skip button or Esc.
 
 ```bash
-npm run build      # static site in dist/ (about 8.4 MB, JS about 350 KB gzipped)
+npm run build      # static site in dist/ (index.html, teacher.html, play.html and their files)
 npm run preview    # serve dist/ locally
 node scripts/map-data.mjs   # only if you change the map: regenerates src/mapdata.js
 ```
 
 `dist/` is plain static files: put it on any web host over http(s). Opening `index.html` from the disk does not work (browsers block ES modules from `file://`).
+
+## Teacher portal and student page (`teacher.html`, `play.html`)
+
+Two more pages next to the one-page site. They are plain JavaScript (no framework) in `src/portal/` and talk to the Smart Schools server (`../smart-schools-app`, see its README, "Teacher portal").
+
+| Page | For | Code |
+|---|---|---|
+| `teacher.html` | Teachers: log in, make quizzes (by hand, from a textbook topic, or an AI draft), pick one of seven ready-made games (`src/portal/games.js`), start it on a big screen, read results | `src/portal/teacher.js` |
+| `play.html?code=123456` | Students on their phones: type the code and a first name, answer | `src/portal/play.js` |
+
+Shared: `api.js` (all server calls), `i18n.js` (the wording, English only), `portal.css`, `ui.js` (escaping and small helpers).
+
+```bash
+# terminal 1: the server (port 8787)
+cd ../smart-schools-app && npm run dev
+# terminal 2: this site (port 5190)
+npm run dev
+```
+
+Open http://localhost:5190/teacher.html. In development the pages look for the server on the same computer at port 8787. For a built site on another host, build with `VITE_API_BASE=https://your-server.example npm run build` and add the site's address to `CORS_ORIGINS` on the server.
+
+The published design artifact cannot reach a server on your laptop: there the portal pages only show "Cannot reach the Smart Schools server".
+
+## Shapes you can hold (the original hand-figure app)
+
+A chapter between "Two ages" and "Hints" (`#shapes`). The shapes are made by the **original hand-figure app by olimoverkinjon** (https://github.com/olimoverkinjon/hand-figure, commit `efc0162`), **used exactly as published, with no change to any of its files**. Raise a hand and a 3D shape appears above it; the number of raised fingers picks the shape (0 cylinder, 1 line, 2 flat sheet, 3 triangular prism, 4 cube, 5 pentagonal prism); the other hand pinches or opens to resize and flicks to spin. No shape shows until a hand is raised.
+
+**The scroll story before the app** (the chapter is pinned while you scroll through it; `buildStory` in `src/shapes.js`, a GSAP timeline from 0 to 100 over the scroll):
+
+1. A page from a textbook arrives with a drawing of a cube (the lines are drawn as you scroll; hidden edges are dotted). The hook: **"A cube on paper isn't a cube."** The page then turns edge-on to show it is only flat.
+2. The page steps back. The question: **"With the Smart Schools system, how would students learn shapes in geometry?"** and under it, in mint, the follow-up: **"Care to check it out?"** with a bobbing arrow.
+3. The story folds away and the frame with the app comes in ("Shapes you can hold."). Scrolling back up switches the camera and the app off.
+- With motion off (`?still=1` or the system setting) there is no pinning: the story, the page and the frame are laid out one after the other.
+
+The visitor then presses **Turn on camera and voice** (or **No camera? Watch the demo**, which is the app's own `?demo` mode), and the app opens in a frame on the page. Around it, the chapter adds only:
+
+- a **voice** that explains each shape as it appears (11 short clips, Edge TTS voice `en-US-AvaMultilingualNeural`), with the same words as a caption;
+- the **numbers of the shape** (faces, edges, vertices, and Euler's V − E + F = 2) in English;
+- English for what the app says in Uzbek: the chapter hides the app's two small text lines and shows the same things in English. It finds the finger count by reading the app's status line.
+
+| File | What |
+|---|---|
+| `vendor/hand-figure/` | The original repository, byte for byte (its own README, package.json, `src/`, `scripts/`). Do not edit |
+| `scripts/build-hand-figure.mjs` | Runs the app's own `scripts/fetch-assets.mjs` (MediaPipe runtime and the 7.8 MB hand model), then builds it with vite into `public/hand-figure/` (git-ignored, about 27 MB). Runs before every `npm run build`; `FORCE=1` rebuilds |
+| `src/shapes.js` | The wrapper: button, frame, voice, captions, English labels |
+| `src/handHud.js` | Reads the app's status line and names the shapes and their counts |
+| `scripts/make-shapes-voice.mjs` | Makes the voice clips in `public/media/shapes/` (needs edge-tts and ffmpeg; run only if you change the words) |
+| `tests/handHud.test.mjs` | `npm test` |
+
+- **Privacy:** the camera is read in the browser by the app. Nothing is recorded or sent. The page and the voice say so.
+- **The camera and the voice start only on a click.** The camera switches off when the chapter is out of sight for a moment or the tab is hidden.
+- **Needs https or localhost** for the camera (a browser rule). The demo works anywhere.
+- **Heavy:** the app draws a lot and its runtime is about 19 MB; the old integrated graphics of a school computer may run it slowly.
+- **Updating the app:** replace the files in `vendor/hand-figure/` with a newer copy and run `FORCE=1 node scripts/build-hand-figure.mjs`. If the app's status-line text changes, update `src/handHud.js`.
 
 ## What is on the page
 
@@ -56,18 +109,18 @@ Six systems, six colours: **AI classroom** (teal), **Classroom games** (purple),
 
 **How it animates (the request flow).** The first time a view opens, every box on the right starts as a dim "slot NN · pending" placeholder (cards) or a greyed-out pill or tag, the two panels and the inputs are dimmed, and the wires are faint. Then each input lights up and sends a small **text chip** (for example "24 answers", "why 3/4 > 2/3?") along a white string into Zukko (the white dot rides ON the string, the text sits to its left), **fading out as it reaches Zukko**. From Zukko the request leaves as **a string of dots** along the wires to the two panels and then to the boxes, one by one. Each box wakes up when hit (the skeleton fades into the real card, the icon pops in, the toggle slides on; there is no glow or shake) and dots run on from it along its lines to the boxes it connects to, so the activation spreads across the columns. At the end every box is awake and **keeps receiving requests all the time** (one single loop sends a new request every 0.32 s (about 3 a second), a constant rate that never speeds up, and each hit passes on to the boxes it connects to, with a plain sentence added to the log). After the wake-up a hit does nothing to the box itself: no glow, no shake. The boxes are slightly see-through (about 84-86% opaque) so the lines behind them show a little. There is no one-system-at-a-time lighting. The Results view streams dots from every tool into the check. **All the little characters keep their eyes moving**: looking left, right, up and down, blinking, smiling and "thinking", each on its own timing (Zukko too). When a little icon smiles it also gives a quick happy shake (the boxes themselves never shake). Zukko shakes too, a bit less. Zukko's smile is two small thick arches. Every character (Zukko too) also has a thinking look: its eyes turn into three loading dots that bounce one after another for about two and a half seconds. Text chips are fully faded out before they reach Zukko, so nothing touches him; there is no halo pulse and no travelling dots on the left wires, only the chips coming in and the dot strings going out.
 
-Everything is **demo data and simulated events**, and the page says so. The hub's inner text stays in English in every language. On phones it shows one stacked view without the buttons.
+Everything is **demo data and simulated events**, and the page says so. On phones it shows one stacked view without the buttons.
 
 ## Change things
 
 - **Copy:** `src/i18n.js`. In headings, `*text*` is drawn in the accent colour.
 - **The AI hub:** `src/hub.js` (helpers, tags, scenarios in `SCEN`).
 - **The map and dive:** `src/map.js`. Stages are driven by scroll progress `p` in `frame()`. The stage is `#mapstage` (560vh, `.stick` is sticky).
-- **Re-capture the app screens** after the app changes: start the Mini App (`cd ../smart-schools-app && npm run dev:web`), then `LANG_CODE=en node scripts/shots.mjs` and `LANG_CODE=uz node scripts/shots.mjs`.
+- **Re-capture the app screens** after the app changes: start the Mini App (`cd ../smart-schools-app && npm run dev:web`), then `node scripts/shots.mjs`.
 
-## Languages
+## Language
 
-Uzbek, Russian, English. **The Uzbek and Russian text was written by AI and has not been reviewed by a native speaker or a teacher**; the page says so in its footer.
+English only. (The Uzbek and Russian versions of the site and the portal were taken out on 9 Nov 2026; a copy of the old files is in `_backup_before_english_only_2026-11-09.tar.gz` next to this folder.)
 
 ## Accessibility and motion
 
@@ -76,7 +129,7 @@ Uzbek, Russian, English. **The Uzbek and Russian text was written by AI and has 
 ## Not verified
 
 - Not checked on a real GPU, in Safari or Firefox, or on a real phone. The preview pane renders WebGL at about 6 fps.
-- Russian was not looked at on screen. The phone layout was only checked at 375 px in the preview pane.
+- The phone layout was only checked at 375 px in the preview pane.
 - The Zukko eye blink and cursor tracking, the hub rounds and the scroll reveals were run, but not frame-by-frame.
 - The map's globe-to-flat crossfade is not perspective-matched: the shape changes slightly as it crosses over.
 - Cities and dots are an illustration. They are not real schools.

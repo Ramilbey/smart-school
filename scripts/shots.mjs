@@ -1,8 +1,8 @@
 // Captures real Mini App screens for the site. Needs the app running: cd ../smart-schools-app && npm run dev:web
 import puppeteer from 'puppeteer-core';
 const BASE = process.env.APP || 'http://localhost:5173';
-const LANG = process.env.LANG_CODE || 'en';
-const W = { en: { stall: 'Pomegranate\\.', math: 'Mathematics', eq: 'Solving equations', next: 'step|next', alg: 'Algebra', lin: 'Linear functions' }, uz: { stall: 'Anor\\.', math: 'Matematika', eq: 'Tenglamalarni', next: 'qadam', alg: 'Algebra', lin: 'Chiziqli funksiya' } }[LANG];
+const LANG = 'en';
+const W = { stall: 'Pomegranate\\.', math: 'Mathematics', eq: 'Solving equations', next: 'step|next', alg: 'Algebra', lin: 'Linear functions' };
 const b = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
 const p = await b.newPage();
 await p.evaluateOnNewDocument((l) => { Object.defineProperty(navigator, 'language', { get: () => l }); Object.defineProperty(navigator, 'languages', { get: () => [l] }); }, LANG);
