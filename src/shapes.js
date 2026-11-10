@@ -14,42 +14,115 @@ const L = T.en;
 
 /* ---------- the voice ---------- */
 
-function createVoice(clips, onText) {
-  const audio = new Audio();
-  audio.preload = 'auto';
-  let on = true, current = null, pending = null, hideTimer = 0;
-  const lastAt = {};
+/**
+ * The spoken lines. They are played through the Web Audio API, not an <audio> tag, on purpose: some browsers (Firefox with
+ * "Block audio and video", Safari, many phones) only let a sound start inside a click. A plain <audio> tag then plays the first
+ * line, which starts in the click, and silently refuses every later one, which starts from a timer. An audio context that was
+ * resumed inside a click keeps working afterwards, so every line plays.
+ *   unlock()  call it inside a click or key press (the start, demo and voice buttons do)
+ *   say(id)   speak a line; with { now: true } it cuts whatever is playing, otherwise it waits for it (only the newest waiting
+ *             line is kept)
+ *   state     { speaking, blocked } is reported through onState, so the page can show it instead of staying silent
+ */
+function createVoice(clips, onText, onState = () => {}) {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  const status = { speaking: false, blocked: false };
+  let ctx = null, out = null, source = null;
+  let on = true, current = null, pending = null, hideTimer = 0, run = 0;
+  const lastAt = {}, buffers = new Map();
+  const set = (k, v) => { if (status[k] !== v) { status[k] = v; onState({ ...status }); } };
   const show = (text, ms) => { onText(text); clearTimeout(hideTimer); hideTimer = setTimeout(() => { if (!current) onText(''); }, ms); };
 
-  function play(id) {
-    const clip = clips[id];
-    if (!clip) return;
-    current = id;
-    lastAt[id] = Date.now();
-    show(clip.text, (clip.seconds + 1.5) * 1000);
-    if (!on) { current = null; return; }
-    audio.src = clip.file;
-    audio.play().catch(() => { current = null; }); // blocked: the caption is still there
+  function context() {
+    if (!ctx && AC) {
+      try {
+        ctx = new AC();
+        out = ctx.createGain();
+        out.connect(ctx.destination);
+        ctx.addEventListener('statechange', () => { if (ctx.state === 'running') set('blocked', false); });
+      } catch { ctx = null; }
+    }
+    return ctx;
   }
-  audio.addEventListener('ended', () => {
+
+  /** A clip, fetched and decoded once. It gives up after 8 seconds so one bad file cannot hold the others back. */
+  function load(id) {
+    if (!buffers.has(id)) {
+      const job = fetch(clips[id].file)
+        .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.arrayBuffer(); })
+        .then((bytes) => new Promise((ok, no) => context().decodeAudioData(bytes, ok, no)));
+      const timeout = new Promise((_, no) => setTimeout(() => no(new Error('timeout')), 8000));
+      buffers.set(id, Promise.race([job, timeout]).catch((e) => { buffers.delete(id); throw e; }));
+    }
+    return buffers.get(id);
+  }
+
+  function unlock() {
+    if (!context()) return;
+    if (ctx.state === 'running') set('blocked', false);
+    else ctx.resume().catch(() => {});
+    // fetch the lines now, while the visitor reads, so each one starts the moment its shape appears
+    for (const id of Object.keys(clips)) load(id).catch(() => {});
+  }
+
+  function stopSource() {
+    const s = source;
+    source = null;
+    if (!s) return;
+    s.onended = null;
+    try { s.stop(); } catch { /* it had already ended */ }
+    s.disconnect();
+  }
+
+  function finished() {
     current = null;
+    set('speaking', false);
     if (pending) { const next = pending; pending = null; play(next); }
     else hideTimer = setTimeout(() => { if (!current) onText(''); }, 1400);
-  });
+  }
+
+  async function play(id) {
+    const clip = clips[id];
+    if (!clip) return;
+    const mine = ++run;
+    current = id;
+    lastAt[id] = Date.now();
+    show(clip.text, (clip.seconds + 1.5) * 1000); // the caption always shows, even when the sound cannot
+    if (!on || !context()) { current = null; return; }
+    if (ctx.state !== 'running') {
+      // inside a click this resumes at once; from a timer the browser may say no, and then the caption is all there is
+      await Promise.race([ctx.resume().catch(() => {}), new Promise((r) => setTimeout(r, 400))]);
+      if (mine !== run) return;
+      if (ctx.state !== 'running') { current = null; set('blocked', true); return; }
+    }
+    let buffer;
+    try { buffer = await load(id); } catch { if (mine === run) current = null; return; }
+    if (mine !== run) return; // a newer line took over while this one was loading
+    stopSource();
+    const s = ctx.createBufferSource();
+    s.buffer = buffer;
+    s.connect(out);
+    s.onended = () => { if (source === s) { source = null; finished(); } };
+    source = s;
+    s.start();
+    set('blocked', false);
+    set('speaking', true);
+  }
 
   return {
-    /** Say a line. If another one is playing, this waits for it (only the newest waiting line is kept). */
+    unlock,
     say(id, { minGap = 0, now = false } = {}) {
       if (!clips[id]) return;
       if (minGap && Date.now() - (lastAt[id] ?? 0) < minGap) return;
-      if (now) { pending = null; audio.pause(); current = null; return play(id); }
+      if (now) { pending = null; run++; stopSource(); current = null; set('speaking', false); return play(id); }
       if (current && on) { if (current !== id) pending = id; return; }
-      play(id);
+      return play(id);
     },
     get busy() { return Boolean(current) && on; },
-    setOn(v) { on = v; if (!on) { audio.pause(); current = null; pending = null; } },
+    get blocked() { return status.blocked; },
+    setOn(v) { on = v; if (!on) { run++; stopSource(); current = null; pending = null; set('speaking', false); set('blocked', false); } },
     get on() { return on; },
-    stop() { audio.pause(); current = null; pending = null; onText(''); },
+    stop() { run++; stopSource(); current = null; pending = null; clearTimeout(hideTimer); set('speaking', false); onText(''); },
   };
 }
 
@@ -109,10 +182,10 @@ function buildStory(root, onProgress) {
 export function createShapes(root, { reduced = false } = {}) {
   const $ = (id) => root.querySelector(`#${id}`);
   const el = {
-    lab: $('shLab'), stage: $('shStage'), ask: $('shAsk'), start: $('shStart'), demo: $('shDemo'), stop: $('shStop'), mute: $('shMute'), cap: $('shCap'),
+    lab: $('shLab'), stage: $('shStage'), ask: $('shAsk'), start: $('shStart'), demo: $('shDemo'), stop: $('shStop'), mute: $('shMute'), muteTxt: $('shMuteTxt'), cap: $('shCap'),
     name: $('shName'), base: $('shBase'), faces: $('shFaces'), edges: $('shEdges'), verts: $('shVerts'), euler: $('shEuler'), nums: $('shNums'),
   };
-  const state = { running: false, frame: null, caption: '', status: '', fingers: null, lastHandAt: 0, timer: 0, away: 0, seen: new Set(), eulerSaid: false, secondSaid: false };
+  const state = { running: false, demo: false, frame: null, caption: '', status: '', fingers: null, cand: null, candN: 0, lastHandAt: 0, timer: 0, away: 0, seen: new Set(), eulerSaid: false, secondSaid: false };
 
   /* one message bubble on the stage: what the voice says, or else the status (looking for a hand, camera blocked…) */
   const refresh = () => {
@@ -123,7 +196,15 @@ export function createShapes(root, { reduced = false } = {}) {
   const setStatus = (text) => { if (state.status !== text) { state.status = text; refresh(); } };
 
   const voiceClips = {};
-  const voice = createVoice(voiceClips, (t) => { state.caption = t; refresh(); });
+  /* the voice button says what the sound is really doing: on, off, speaking, or blocked by the browser */
+  const paintVoice = (s = {}) => {
+    el.mute.classList.toggle('speaking', Boolean(s.speaking));
+    el.mute.classList.toggle('warn', Boolean(s.blocked));
+    el.muteTxt.textContent = s.blocked ? L.shVoiceBlocked : voice.on ? L.shVoiceOn : L.shVoiceOff;
+  };
+  const voice = createVoice(voiceClips, (t) => { state.caption = t; refresh(); }, paintVoice);
+  // a browser that blocked the sound lets it start again on the next click or key press anywhere
+  const retrySound = (e) => { if (!e.target.closest?.('#shMute')) voice.unlock(); }; // the voice button handles its own click
   fetch('media/shapes/voice.json')
     .then((r) => (r.ok ? r.json() : null))
     .then((data) => { if (data?.clips) Object.assign(voiceClips, data.clips); })
@@ -144,11 +225,14 @@ export function createShapes(root, { reduced = false } = {}) {
   }
   const clearFacts = () => { el.name.textContent = ''; el.euler.textContent = ''; el.nums.hidden = true; };
 
-  /* a new shape: show its numbers and explain it */
+  /* a new shape: show its numbers and explain it. With a camera the line cuts the old one, so the voice never describes a
+     shape that has already gone. The demo changes shape every two seconds, faster than any line can be said, so there the voice
+     explains the demo once and the numbers on the screen follow the shape. */
   function onShape(fingers) {
     showFacts(fingers);
+    if (state.demo) return;
     state.seen.add(fingers);
-    voice.say(`n${fingers}`);
+    voice.say(`n${fingers}`, { now: true });
     if (!state.eulerSaid && [3, 4, 5].every((n) => state.seen.has(n))) { state.eulerSaid = true; voice.say('euler'); }
     if (!state.secondSaid && fingers >= 3) {
       state.secondSaid = true;
@@ -166,7 +250,12 @@ export function createShapes(root, { reduced = false } = {}) {
     const now = Date.now();
     if (hud.hand) {
       state.lastHandAt = now;
-      if (hud.fingers !== state.fingers) { state.fingers = hud.fingers; onShape(hud.fingers); }
+      if (hud.fingers === state.fingers) { state.cand = null; state.candN = 0; }
+      else {
+        // a count has to hold for three looks in a row (about 0.75 s), so a wavering hand does not make the voice restart
+        if (hud.fingers === state.cand) state.candN += 1; else { state.cand = hud.fingers; state.candN = 1; }
+        if (state.candN >= (state.demo ? 1 : 3)) { state.fingers = hud.fingers; state.cand = null; state.candN = 0; onShape(hud.fingers); }
+      }
       setStatus('');
     } else if (kind === 'denied') setStatus(L.shErrDenied);
     else if (kind === 'failed') setStatus(L.shErrStart);
@@ -181,13 +270,18 @@ export function createShapes(root, { reduced = false } = {}) {
   function open(demo) {
     if (state.running) return;
     state.running = true;
+    state.demo = demo;
     state.fingers = null;
+    state.cand = null; state.candN = 0;
     state.lastHandAt = Date.now();
+    voice.unlock(); // inside the click: this is what lets every later line play
+    addEventListener('pointerdown', retrySound, true);
+    addEventListener('keydown', retrySound, true);
     el.ask.classList.add('gone');
     el.stop.hidden = false;
     clearFacts();
     setStatus(demo ? '' : L.shAsking);
-    if (!demo) voice.say('intro', { now: true }); // inside the click, so the browser lets the voice play
+    voice.say(demo ? 'demo' : 'intro', { now: true }); // inside the click, so the browser lets the voice play
     const f = document.createElement('iframe');
     f.className = 'sh-frame';
     f.title = 'Hand tracking: raise a hand and a 3D shape appears above it';
@@ -212,6 +306,8 @@ export function createShapes(root, { reduced = false } = {}) {
     if (!state.running) return;
     state.running = false;
     clearInterval(state.timer);
+    removeEventListener('pointerdown', retrySound, true);
+    removeEventListener('keydown', retrySound, true);
     const f = state.frame;
     try { f?.contentDocument?.getElementById('cam')?.srcObject?.getTracks().forEach((t) => t.stop()); } catch { /* already gone */ }
     f?.remove();
@@ -228,12 +324,15 @@ export function createShapes(root, { reduced = false } = {}) {
   el.demo.addEventListener('click', () => open(true));
   el.stop.addEventListener('click', close);
   el.mute.addEventListener('click', () => {
+    const wasBlocked = voice.blocked;
+    voice.unlock();
+    if (wasBlocked) return; // this click is what the browser wanted; it only turns the sound back on, the next line is heard
     const on = !voice.on;
     voice.setOn(on);
     el.mute.setAttribute('aria-pressed', String(!on));
-    el.mute.textContent = on ? L.shVoiceOn : L.shVoiceOff;
+    paintVoice();
   });
-  el.mute.textContent = L.shVoiceOn;
+  paintVoice();
   clearFacts();
 
   // the camera switches off when the chapter has been out of sight for a moment, or the tab is hidden

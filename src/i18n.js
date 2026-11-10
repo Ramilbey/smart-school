@@ -49,7 +49,7 @@ export const T = {
     shStart: 'Turn on camera and voice', shDemo: 'No camera? Watch the demo', shStop: 'Turn off camera',
     shPrivacy: 'The camera stays in your browser. Nothing is recorded or sent anywhere.',
     shHint: 'First hand: fingers pick the shape (0 to 5). Other hand: pinch or open to resize, flick to spin.',
-    shVoiceOn: 'Voice on', shVoiceOff: 'Voice off',
+    shVoiceOn: 'Voice on', shVoiceOff: 'Voice off', shVoiceBlocked: 'Click for sound',
     shLblBase: 'Base sides', shLblFaces: 'Faces', shLblEdges: 'Edges', shLblVerts: 'Vertices',
     shRound: 'Round', shNoEuler: 'A curved solid: Euler’s rule is for flat faces.',
     shAsking: 'Allow the camera in your browser…', shLoading: 'Loading the hand model and the camera…', shLooking: 'Hold a hand where the camera can see it.',

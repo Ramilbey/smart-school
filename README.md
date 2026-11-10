@@ -60,7 +60,7 @@ A chapter between "Two ages" and "Hints" (`#shapes`). The shapes are made by the
 
 The visitor then presses **Turn on camera and voice** (or **No camera? Watch the demo**, which is the app's own `?demo` mode), and the app opens in a frame on the page. Around it, the chapter adds only:
 
-- a **voice** that explains each shape as it appears (11 short clips, Edge TTS voice `en-US-AvaMultilingualNeural`), with the same words as a caption;
+- a **voice** that explains each shape as it appears (12 short clips, Edge TTS voice `en-US-AvaMultilingualNeural`), with the same words as a caption. With a camera, a shape that holds for about 0.75 s cuts the previous line, so the voice never describes a shape that has gone; the demo changes shape every 2 s, so it gets one `demo` line instead. The lines are played with the Web Audio API, unlocked inside the click on the start or demo button: a plain `<audio>` tag is refused from timers by some browsers (Firefox with "Block audio and video", Safari, phones), which silenced every line after the first. If a browser still refuses, the voice button turns orange and says "Click for sound", and the caption stays;
 - the **numbers of the shape** (faces, edges, vertices, and Euler's V − E + F = 2) in English;
 - English for what the app says in Uzbek: the chapter hides the app's two small text lines and shows the same things in English. It finds the finger count by reading the app's status line.
 
@@ -70,7 +70,7 @@ The visitor then presses **Turn on camera and voice** (or **No camera? Watch the
 | `scripts/build-hand-figure.mjs` | Runs the app's own `scripts/fetch-assets.mjs` (MediaPipe runtime and the 7.8 MB hand model), then builds it with vite into `public/hand-figure/` (git-ignored, about 27 MB). Runs before every `npm run build`; `FORCE=1` rebuilds |
 | `src/shapes.js` | The wrapper: button, frame, voice, captions, English labels |
 | `src/handHud.js` | Reads the app's status line and names the shapes and their counts |
-| `scripts/make-shapes-voice.mjs` | Makes the voice clips in `public/media/shapes/` (needs edge-tts and ffmpeg; run only if you change the words) |
+| `scripts/make-shapes-voice.mjs` | Makes the voice clips in `public/media/shapes/` (needs edge-tts and ffmpeg; run only if you change the words; `node scripts/make-shapes-voice.mjs demo` makes just the named lines) |
 | `tests/handHud.test.mjs` | `npm test` |
 
 - **Privacy:** the camera is read in the browser by the app. Nothing is recorded or sent. The page and the voice say so.

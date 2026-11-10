@@ -2,10 +2,11 @@
 // The lines follow the shapes of the original hand-figure app: 0 fingers a cylinder, 1 a line, 2 a flat sheet, 3 a triangular prism,
 // 4 a cube, 5 a pentagonal prism; the other hand makes the shape bigger or smaller and spins it.
 // Needs edge-tts (pip install edge-tts) and ffmpeg. The lines are sent to Microsoft's text-to-speech service, so only public text goes in here.
-//   node scripts/make-shapes-voice.mjs
+//   node scripts/make-shapes-voice.mjs          (all lines)
+//   node scripts/make-shapes-voice.mjs demo     (only the lines named; the others stay as they are)
 // Set EDGE_TTS to the edge-tts program if it is not on the PATH.
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,6 +30,7 @@ const clips = {
   intro: 'This is how a geometry lesson could feel in Smart Schools. Everything stays in your browser, and nothing is recorded. Raise one hand in front of the camera, and hold up three fingers.',
   wait: 'I can’t see a hand yet. Raise it a little higher, with the palm toward the camera.',
   nocam: 'No camera? No problem. Press the demo button, and the shapes change by themselves.',
+  demo: 'This is the demo. A pretend hand counts from zero to five, and the shape changes with every finger. Watch the numbers: faces, edges, vertices. With a camera, you choose the shape yourself.',
   n0: 'A closed fist: a cylinder. It has two flat faces, one curved face, and no corners at all. A circle is like a shape with endless sides.',
   n1: 'One finger: a single line. A line has length, but no width and no height.',
   n2: 'Two fingers: the base shrinks to a line segment, so the solid becomes a flat sheet, with length and height, and no depth.',
@@ -51,8 +53,11 @@ function run(cmd, args) {
 
 mkdirSync(out, { recursive: true });
 const tmp = mkdtempSync(path.join(os.tmpdir(), 'shapes-voice-'));
-const list = {};
+const only = process.argv.slice(2);
+const jsonPath = path.join(out, 'voice.json');
+const list = only.length && existsSync(jsonPath) ? JSON.parse(readFileSync(jsonPath, 'utf8')).clips : {};
 for (const [id, text] of Object.entries(clips)) {
+  if (only.length && !only.includes(id)) continue;
   const raw = path.join(tmp, `${id}.mp3`);
   const file = path.join(out, `${id}.mp3`);
   run(EDGE, ['--voice', VOICE, '--rate=-4%', '--text', text, '--write-media', raw]);
@@ -62,5 +67,5 @@ for (const [id, text] of Object.entries(clips)) {
   console.log(id.padEnd(6), seconds.toFixed(1).padStart(5), 's  ', text.slice(0, 70));
 }
 rmSync(tmp, { recursive: true, force: true });
-writeFileSync(path.join(out, 'voice.json'), JSON.stringify({ voice: VOICE, clips: list }, null, 2) + '\n');
+writeFileSync(jsonPath, JSON.stringify({ voice: VOICE, clips: list }, null, 2) + '\n');
 console.log(`Wrote ${Object.keys(list).length} clips to ${out}`);

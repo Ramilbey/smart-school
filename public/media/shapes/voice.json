@@ -55,6 +55,11 @@
       "file": "media/shapes/n5.mp3",
       "text": "Five fingers: the base has five sides, so this is a pentagonal prism. Seven faces, fifteen edges, ten vertices.",
       "seconds": 9.07
+    },
+    "demo": {
+      "file": "media/shapes/demo.mp3",
+      "text": "This is the demo. A pretend hand counts from zero to five, and the shape changes with every finger. Watch the numbers: faces, edges, vertices. With a camera, you choose the shape yourself.",
+      "seconds": 14.42
     }
   }
 }

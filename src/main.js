@@ -170,6 +170,7 @@ if (reduced) {
 } else {
   document.body.classList.add('booting');
   const loader = createLoader($('#bootsvg'), { width: innerWidth, height: innerHeight, fade: false });
+  boot.classList.add('on'); // the counter and Skip fade in together with the ring
   const t0 = performance.now();
   const bootn = $('#bootn');
   const step = (now) => {
