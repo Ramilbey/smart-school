@@ -22,6 +22,9 @@
     #skip { position: absolute; right: 28px; bottom: clamp(18px, 4vh, 40px); border: 0; background: none; font: 400 14px 'Geologica Variable', 'Geologica', system-ui, sans-serif; color: #8d97c9; padding: 8px 4px; border-bottom: 1px solid rgba(233, 238, 255, 0.2); cursor: pointer; }
     #skip:hover { color: #e9eeff; }
   </style>
+  <!-- boot.js is a tiny separate file (made from src/boot.js by the build): the opening animation starts the moment it arrives,
+       while main.js, the page itself, is still downloading beside it, and takes over when it is ready -->
+  <script defer src="./boot.js"></script>
 </head>
 <body class="booting">
   <!-- the approved Smart Schools loading animation opens the site, with a counter in the corner -->
@@ -128,7 +131,7 @@
           <h2 class="rv film-title" id="filmTitle" data-i18n="filmTitle">The whole idea in 1:47.</h2>
           <div class="film-stage" id="filmStage">
             <div class="vframe" id="vframe">
-              <video id="vid" playsinline preload="metadata" controls poster="media/film-poster.jpg">
+              <video id="vid" playsinline preload="none" controls poster="media/film-poster.jpg">
                 <source src="media/film-720.mp4" type="video/mp4" />
                 <track kind="captions" src="media/film.vtt" srclang="en" label="English" />
               </video>
@@ -175,8 +178,8 @@
           <div class="tags"><span class="tag mint" data-i18n="g14">Grades 1 to 4</span><span class="tag lilac" data-i18n="g511">Grades 5 to 11</span></div>
         </div>
         <div class="phones">
-          <div class="phone ph1"><img id="ph1" alt="The Grade 4 bazaar map" /></div>
-          <div class="phone ph2"><img id="ph2" alt="A linear function lesson with sliders" /></div>
+          <div class="phone ph1"><img id="ph1" alt="The Grade 4 bazaar map" loading="lazy" decoding="async" /></div>
+          <div class="phone ph2"><img id="ph2" alt="A linear function lesson with sliders" loading="lazy" decoding="async" /></div>
         </div>
       </div>
     </section>

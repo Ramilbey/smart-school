@@ -5,12 +5,12 @@ import './style.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import QRCode from 'qrcode';
-import { createLoader } from './smartLoader.ts';
 import { createHub } from './hub.js';
 import { createHeroGlobe } from './herogl.js';
 import { createFilm } from './film.js';
 import { createAnamorph } from './anamorph.js';
 import { createShapes } from './shapes.js';
+import { quality, frame as qualityFrame } from './quality.js';
 import { BOT_URL, T } from './i18n.js';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -109,7 +109,7 @@ function applyLang() {
   document.documentElement.lang = lang;
   $$('[data-i18n]:not(.rv)').forEach((el) => { const v = T[lang][el.dataset.i18n]; if (v != null) el.textContent = v; });
   $$('.rv').forEach(renderRV);
-  $('#ph1').src = 'shots/en-bazaar.jpg'; $('#ph2').src = 'shots/en-line.jpg';
+  $('#ph1').src = 'shots/en-bazaar.webp'; $('#ph2').src = 'shots/en-line.webp';
   renderReport(); setCut(false); litWords();
   if (typeof anText === 'function') { anText(); wrapSaying(); }
   if (typeof anamP !== 'undefined' && T[lang].anWord !== anWordNow) { anWordNow = T[lang].anWord; anamP.then((a) => a?.setWord(anWordNow)); }
@@ -149,6 +149,13 @@ function anText() {
 }
 const anamP = createAnamorph({ canvas: $('#anCanvas'), stage: $('#anStage'), range: $('#anRange'), angleEl: $('#anAngle'), btnResolve: $('#anResolve'), btnChange: $('#anChange'), hint: $('#anHint'), run: $('#anRun'), reduced, onProgress: (p) => { anProg = p; lightSaying(); }, word: anWordNow, onState: (a) => { anAligned = a; anText(); } }).catch((e) => { console.warn('anamorph', e); return null; });
 
+/* a device that cannot keep up even at the lowest resolution gets the opening as a picture instead of the 3D globe */
+quality.onLite(() => {
+  document.body.classList.add('hg-fallback');
+  hg = null;
+  ScrollTrigger.refresh();
+});
+
 /* ---------- the AI hub ---------- */
 const hub = createHub($('#hub'), $('#hub2'), { reduced });
 
@@ -158,6 +165,7 @@ const boot = $('#boot');
 function finishBoot() {
   if (booted) return;
   booted = true;
+  const bn = document.getElementById('bootn'); if (bn) bn.textContent = '100';
   boot.classList.add('gone');
   document.body.classList.remove('booting');
   setTimeout(() => boot.remove(), reduced ? 0 : 1200);
@@ -168,21 +176,11 @@ function finishBoot() {
 if (reduced) {
   boot.remove(); booted = true; document.body.classList.remove('booting');
 } else {
-  document.body.classList.add('booting');
-  const loader = createLoader($('#bootsvg'), { width: innerWidth, height: innerHeight, fade: false });
-  boot.classList.add('on'); // the counter and Skip fade in together with the ring
-  const t0 = performance.now();
-  const bootn = $('#bootn');
-  const step = (now) => {
-    if (booted) return;
-    const t = (now - t0) / 1000;
-    loader.setTime(Math.min(t, loader.settled));
-    bootn.textContent = String(Math.round(clamp(t / (loader.settled + 0.4)) * 100)).padStart(3, '0');
-    if (t < loader.settled + 0.8) requestAnimationFrame(step); else finishBoot();
-  };
-  requestAnimationFrame(step);
-  $('#skip').addEventListener('click', finishBoot);
-  addEventListener('keydown', (e) => { if (e.key === 'Escape') finishBoot(); });
+  // the animation itself runs in boot.js (a separate, tiny script); this page takes over when it has finished or was skipped
+  const bootCtl = (window.__ssBoot = window.__ssBoot || { done: false, onDone: null, started: false, finish() { if (this.done) return; this.done = true; this.onDone && this.onDone(); } });
+  if (bootCtl.done) finishBoot(); else bootCtl.onDone = finishBoot;
+  // boot.js blocked or missing: never leave the visitor under the loader
+  setTimeout(() => { if (!bootCtl.started) finishBoot(); }, 6000);
 }
 applyLang();
 
@@ -238,6 +236,7 @@ const DARK = ['hero', 'film', 'black', 'blue', 'ink', 'deep', 'anam', 'shapes'];
 let tNow = 0;
 function tick(now) {
   tNow = now / 1000;
+  qualityFrame(now);
   const vh = M.vh;
   let ch = 0, dark = false;
   secs.forEach((s, k) => { const r = s.getBoundingClientRect(); if (r.top <= vh * 0.5) ch = k; if (r.top <= 44 && r.bottom > 44) dark = DARK.some((c) => s.classList.contains(c)); });

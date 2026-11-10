@@ -6,6 +6,7 @@
 // approximation from a list of large cities, not satellite data.
 import * as THREE from 'three';
 import { UZ, UZ_EDGE, GLOBE } from './mapdata.js';
+import { quality } from './quality.js';
 
 const i16 = (b64) => { const bin = atob(b64); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Int16Array(u.buffer); };
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -29,7 +30,8 @@ const CITIES = [
 
 export function createHeroGlobe(canvas, { reduced = false } = {}) {
   const parent = canvas.parentElement;
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: quality.antialias });
+  quality.watch(canvas);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.02, 80);
   const group = new THREE.Group();
@@ -176,7 +178,7 @@ export function createHeroGlobe(canvas, { reduced = false } = {}) {
   const resize = () => {
     W = parent.clientWidth; H = parent.clientHeight;
     if (!W || !H) return;
-    const pr = Math.min(window.devicePixelRatio || 1, 1.75); PR = pr;
+    const pr = quality.pixelRatio(1.5); PR = pr;
     renderer.setPixelRatio(pr); renderer.setSize(W, H, false);
     camera.aspect = W / H; camera.updateProjectionMatrix();
     const px = (pr * H) / (2 * Math.tan((camera.fov * D2R) / 2));
@@ -185,6 +187,7 @@ export function createHeroGlobe(canvas, { reduced = false } = {}) {
     landDots.material.uniforms.uMax.value = 4 * pr; detailDots.material.uniforms.uMax.value = 7 * pr; edgeMat.uniforms.uMax.value = 5.5 * pr;
   };
   resize();
+  quality.onChange(resize); // a slower device was detected: draw fewer pixels
 
   /* ---------- one frame, from the (already smoothed) scroll progress p, 0 to 1 ---------- */
   const tanH = Math.tan((camera.fov * D2R) / 2);

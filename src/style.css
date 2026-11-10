@@ -166,6 +166,8 @@ h2.huge { font-size: clamp(56px, 8vw, 88px); line-height: 1; letter-spacing: -0.
 .phone { position: absolute; width: 250px; height: 520px; padding: 10px; border-radius: 40px; background: var(--ink); box-shadow: 0 14px 0 var(--be); }
 .phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 30px; background: #f4f6ff; }
 .ph1 { left: 20px; top: 50px; transform: rotate(-5deg); } .ph2 { left: 250px; top: 0; transform: rotate(5deg); }
+/* the tilted second phone must not push the page wider than a small screen (a clip, not a scroll area, so pinned chapters are not affected) */
+#ages { overflow-x: hidden; overflow-x: clip; }
 .hintbox { padding: 30px; border-radius: 36px; background: #f4f6ff; box-shadow: 0 12px 0 var(--le); display: flex; flex-direction: column; gap: 18px; }
 .zrow { display: flex; align-items: center; gap: 16px; }
 .mini-owl { flex: none; width: 92px; }
@@ -288,7 +290,7 @@ body.still *, body.still *::before, body.still *::after { animation: none !impor
 .hb-tab:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; border-radius: 4px; }
 
 /* ---------- hero background: the Tashkent skyline drawing ---------- */
-.hero { position: relative; isolation: isolate; color: #e9eeff; background: #0a0d13 url('./assets/hero-skyline.jpg') center bottom / cover no-repeat; }
+.hero { position: relative; isolation: isolate; color: #e9eeff; background: #0a0d13 url('./assets/hero-skyline.webp') center bottom / cover no-repeat; }
 .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, rgba(8, 10, 16, 0.86) 0%, rgba(8, 10, 16, 0.6) 42%, rgba(8, 10, 16, 0.08) 78%), linear-gradient(0deg, #0a0e12 0%, rgba(10, 14, 18, 0) 24%); }
 .hero h1 { color: #fff; }
 .hero h1 .acc { color: #8793ff; }
@@ -304,6 +306,10 @@ body.still *, body.still *::before, body.still *::after { animation: none !impor
 .hero::before { background: linear-gradient(0deg, #0a0e12 0%, rgba(10, 14, 18, 0) 24%); }
 /* while the picture is under it, the navigation bar has no background of its own */
 .top.clear::before { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* a weak device (see quality.js): the header's frosted glass is redrawn on every scroll frame, so it becomes a plain, nearly solid bar */
+html.low .top::before { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(238, 241, 255, 0.95); }
+html.low .top.dark::before { background: rgba(5, 5, 8, 0.9); }
+html.low .top.clear::before { background: transparent; }
 /* no light borders: the page behind and the scrollbar are as dark as the picture */
 html, body { background: #0a0d13; }
 html { scrollbar-color: #343b4e #0a0d13; }
@@ -318,7 +324,7 @@ html { scrollbar-color: #343b4e #0a0d13; }
 .hero::before { display: none; }
 .hg-run { position: relative; height: 560vh; }
 .hg-pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #0a0d13; contain: layout paint; }
-.hg-pic { position: absolute; inset: 0; opacity: 0; transform: scale(1.08); will-change: opacity, transform; background-image: linear-gradient(0deg, #0a0e12 0%, rgba(10, 14, 18, 0) 9%), url('./assets/hero-skyline.jpg'); background-repeat: no-repeat; background-position: 0 0, center clamp(24px, 3.5vh, 48px); background-size: 100% 100%, cover; }
+.hg-pic { position: absolute; inset: 0; opacity: 0; transform: scale(1.08); will-change: opacity, transform; background-image: linear-gradient(0deg, #0a0e12 0%, rgba(10, 14, 18, 0) 9%), url('./assets/hero-skyline.webp'); background-repeat: no-repeat; background-position: 0 0, center clamp(24px, 3.5vh, 48px); background-size: 100% 100%, cover; }
 #hgCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; will-change: opacity; }
 body.still .hg-run, body.hg-fallback .hg-run { height: 100vh; height: 100svh; }
 body.still .hg-pic, body.hg-fallback .hg-pic { opacity: 1; transform: none; }

@@ -4,6 +4,7 @@
 // only one angle reads.
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { quality } from './quality.js';
 
 const D = 10, H0 = 3.4, MAX = 0.75, PITCH = 11;
 const rand = (seed) => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -63,7 +64,8 @@ function slats(m) {
 
 export async function createAnamorph(o) {
   const { canvas, stage, range, angleEl, btnResolve, btnChange, hint, reduced, onState, onProgress, word, run } = o;
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: quality.antialias });
+  quality.watch(canvas);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(28, 2, 0.1, 60);
   const mat = new THREE.ShaderMaterial({
@@ -94,7 +96,7 @@ export async function createAnamorph(o) {
   function fit() {
     const W = stage.clientWidth, H = stage.clientHeight;
     if (!W || !H) return;
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(W, H, false);
+    renderer.setPixelRatio(quality.pixelRatio(1.5)); renderer.setSize(W, H, false);
     const aspect = W / H, pw = (mw / mh) * H0;
     const visH = Math.max(H0 / 0.8, pw / 0.94 / aspect);
     camera.aspect = aspect; camera.fov = (2 * Math.atan(visH / (2 * D)) * 180) / Math.PI; camera.updateProjectionMatrix();
@@ -129,6 +131,7 @@ export async function createAnamorph(o) {
   apply(theta);
   if (reduced) onProgress?.(1);
   addEventListener('resize', fit);
+  quality.onChange(fit);
 
   gsap.ticker.add(() => {
     if (!running || !mesh) return;

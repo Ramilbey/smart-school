@@ -195,3 +195,14 @@ The lines now end exactly on the edge of each box (and start on the edge of each
 When the AI hub is first scrolled into view, everything arrives one box after another (the left chips, the two panels, Zukko and the lines first, then the boxes of the open tab), each fading in and growing from smaller; then the opening plays. Until then nothing in the hub is visible. It does not replay when you scroll away and come back (press a tab to replay).
 
 Correction: the hub arrival replays every time you scroll back into the section (if you were away for more than about a second), starting from nothing and playing the opening again. It is not first-time-only.
+
+## Speed on slow connections and weak devices
+
+Measured on 2026-11-10: from the machine this was built on, the VPS in Dallas is about 330 ms away with heavy packet loss, so one connection delivers only ~120 KB/s. What the page does about it:
+
+- **Little to download first.** First view is 0.69 MB compressed (it was 3.6 MB). The film (5.5 MB) has `preload="none"`, the hero picture and the phone screenshots are WebP (`src/assets/hero-skyline.webp`, `public/shots/*.webp`; the `.jpg` screenshots in `public/shots` are the originals from `scripts/shots.mjs`, convert with `ffmpeg -i x.jpg -vf scale=600:-2 -c:v libwebp_anim -quality 78 x.webp`), the screenshots load lazily.
+- **The opening animation starts at once.** `src/boot.js` is built by `npm run build:boot` (run automatically by `npm run dev` and `npm run build`) into `public/boot.js` (git-ignored, ~3 KB gzipped). It is a separate classic script in the head, so the animation plays while `main.js` (3D, scroll motion, everything heavy) is still downloading, then hands over through `window.__ssBoot`. If it is blocked, `main.js` shows the page after 6 s anyway.
+- **Libraries in separate files** (`vite.config.js`, `manualChunks`: three, gsap, qrcode). Browsers fetch several files at once, which is faster than one big file on a lossy connection.
+- **Adaptive 3D quality** (`src/quality.js`). The 3D scenes start at a lower resolution and without smoothing on weak devices (old graphics chips, software drawing, 2 cores or less, 2 GB or less, data saver), watch real frame times while a 3D canvas is on screen, step the resolution down if frames take more than 26 ms, and if even the lowest step is too slow, switch the opening globe to its picture (`hg-fallback`). `html.low` also turns the header's frosted glass into a plain bar. Type `__ssQuality` in the browser console to see what a device got.
+- **Do not turn HTTP/2 on for the VPS without measuring.** On this lossy path, six HTTP/1.1 connections were about 40% faster than one HTTP/2 connection (3.0 s against 5.0 s for the same files).
+- **Small screens.** Checked at 1366x650, 1280x600, 1024x600, 768x1024 and 390x844. `#ages { overflow-x: clip }` stops the tilted phone from widening the page on a phone (do not put `overflow-x: hidden` on `html`: it would break the pinned chapters).

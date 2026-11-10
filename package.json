@@ -7,7 +7,9 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview --host",
-    "prebuild": "node scripts/build-hand-figure.mjs",
+    "build:boot": "esbuild src/boot.js --bundle --format=iife --minify --target=es2019 --outfile=public/boot.js --log-level=warning",
+    "predev": "npm run build:boot",
+    "prebuild": "node scripts/build-hand-figure.mjs && npm run build:boot",
     "assets:hand": "node scripts/build-hand-figure.mjs",
     "assets:voice": "node scripts/make-shapes-voice.mjs",
     "test": "node --test tests/*.test.mjs"
