@@ -46,7 +46,7 @@ Base address: **https://smart-schools.163-245-192-206.sslip.io**
 **Platform**
 - One Node server hands out the website, the student area, the Mini App, the teacher portal and the API, and runs the bot. A systemd service behind nginx with HTTPS, on a 1 vCPU / 2 GB VPS.
 - UI in Uzbek (Latin), Russian and English.
-- 237 server and shared-code tests plus 5 for the website (`npm test`), clean typecheck, and a Dockerfile.
+- 237 server and shared-code tests plus 5 for the website (`npm test`), clean typecheck, a build from a fresh clone, and a Dockerfile.
 - Nightly backup of accounts, quizzes and results; AI usage caps per person and for everyone; rate limits on login and joining.
 
 ## How the AI is kept honest and private
@@ -105,7 +105,7 @@ npm start                     # http://localhost:8787
 
 With no keys at all it runs: the prepared lessons, the solver, quizzes, live games and the teacher portal all work. Add `GEMINI_API_KEYS` (a free Google AI Studio key) or `ANTHROPIC_API_KEY` to turn on the AI tutor, Ask AI and AI quiz drafts; add `TELEGRAM_BOT_TOKEN` and `MINI_APP_URL` to run the bot. See the README's configuration table. For development: `npm run dev` (Mini App on 5173 plus the API on 8787).
 
-Checks: `npm run typecheck`, `npm test`. A Docker image is described in the `Dockerfile` (`docker build -t smart-schools . && docker run -p 8787:8787 smart-schools`).
+Checks: `npm run typecheck`, `npm test`. A `Dockerfile` is included (`docker build -t smart-schools . && docker run -p 8787:8787 smart-schools`); it was updated for this layout but not built in the final check, because Docker was not running on the machine used. The route above (clone, `npm ci`, `npm run build:all`, `npm start`) was run from a fresh clone and works.
 
 ## Team and contact
 
