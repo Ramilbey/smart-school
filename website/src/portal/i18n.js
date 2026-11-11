@@ -77,7 +77,7 @@ export const T = {
     sugg1: 'Who is struggling?', sugg2: 'Which questions were hardest?', sugg3: 'Who is getting worse?', sugg4: 'Make 6 questions about fractions',
     sugg5: 'Make a gamified quiz about matrices and play it as a race', sugg6: 'Show my recent games',
     needsAttention: 'Needs attention', hardestTitle: 'Hardest questions', lastGames: 'Recent games', insightsEmpty: 'Run a game with your class and the results will show up here.',
-    noOneStands: 'Nobody stands out yet.', sampleData: 'Sample data', sampleNote: 'This is made-up class data so you can try the assistant. Real games add to it.',
+    noOneStands: 'Nobody stands out yet.', sampleData: 'Includes sample data', sampleTag: 'Sample', sampleNote: 'Rows marked Sample are made-up demo data so you can try the assistant. Your real games are shown without the mark.',
     answeredN: '{a} answers in {g} games', trendUp: 'getting better', trendDown: 'getting worse', missedLabel: 'Missed', correctPct: '{p}% right', resultsBtn: 'Results', playersCount: '{n} students',
     openInEditor: 'Open in the editor', playAsLabel: 'Play as', styleLabel: 'Style', styleStandard: 'Standard', styleGamified: 'Gamified', typesLabel: 'Question types',
     typeChoice: 'Multiple choice', typeTf: 'True or false', typeNumber: 'Number', typeText: 'Short word', kindNumber2: 'number', kindText2: 'word', kindChoice2: 'choice', moreQuestions: '+{n} more questions',

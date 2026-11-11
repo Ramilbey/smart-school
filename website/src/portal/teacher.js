@@ -115,12 +115,13 @@ const bar = (p) => `<span class="mini-bar ${accClass(p)}"><i style="width:${Math
 const trendTag = (t) => (t === 'down' ? `<span class="trend down">↓ ${tr('trendDown')}</span>` : t === 'up' ? `<span class="trend up">↑ ${tr('trendUp')}</span>` : '');
 const cut = (t, n) => { const x = plainText(t); return x.length > n ? `${x.slice(0, n - 1)}…` : x; };
 
+const sampleTag = (r) => (r.sample ? `<span class="tag warm" title="${esc(tr('sampleNote'))}">${tr('sampleTag')}</span>` : '');
 const studentRow = (s) => `<div class="srow"><span class="av" aria-hidden="true">${esc(String(s.name).charAt(0).toUpperCase())}</span><div class="grow stack" style="gap:6px">
-  <div class="row between"><b>${esc(s.name)}</b><span class="pcs ${accClass(s.accuracy)}">${s.accuracy}%</span></div>${bar(s.accuracy)}
+  <div class="row between"><b>${esc(s.name)} ${sampleTag(s)}</b><span class="pcs ${accClass(s.accuracy)}">${s.accuracy}%</span></div>${bar(s.accuracy)}
   <div class="small dim">${tr('answeredN', { a: s.answered, g: s.games ?? s.sessions })} ${trendTag(s.trend)}</div>
   ${s.missed?.length ? `<div class="miss"><span class="small dim">${tr('missedLabel')}:</span> ${s.missed.map((m) => `<span class="tag">${esc(cut(m, 46))}</span>`).join('')}</div>` : ''}</div></div>`;
-const questionRow = (q) => `<div class="qrow"><span class="grow">${esc(cut(q.prompt, 90))}</span>${bar(q.correctPercent)}<b class="pcs ${accClass(q.correctPercent)}">${q.correctPercent}%</b></div>`;
-const gameRow = (g) => `<div class="item"><span><b>${esc(g.title)}</b> <span class="mute">· ${new Date(g.finishedAt).toLocaleDateString('en-GB', { dateStyle: 'medium' })} · ${tr('playersCount', { n: g.players })}${g.accuracy === null ? '' : ` · ${tr('correctPct', { p: g.accuracy })}`}</span></span><button class="btn sm" data-act="results" data-code="${g.code}">${tr('resultsBtn')}</button></div>`;
+const questionRow = (q) => `<div class="qrow"><span class="grow">${esc(cut(q.prompt, 90))} ${sampleTag(q)}</span>${bar(q.correctPercent)}<b class="pcs ${accClass(q.correctPercent)}">${q.correctPercent}%</b></div>`;
+const gameRow = (g) => `<div class="item"><span><b>${esc(g.title)}</b> ${sampleTag(g)} <span class="mute">· ${new Date(g.finishedAt).toLocaleDateString('en-GB', { dateStyle: 'medium' })} · ${tr('playersCount', { n: g.players })}${g.accuracy === null ? '' : ` · ${tr('correctPct', { p: g.accuracy })}`}</span></span><button class="btn sm" data-act="results" data-code="${g.code}">${tr('resultsBtn')}</button></div>`;
 
 const KIND_WORD = { choice: 'kindChoice2', number: 'kindNumber2', text: 'kindText2' };
 function quizDraft(q, i) {

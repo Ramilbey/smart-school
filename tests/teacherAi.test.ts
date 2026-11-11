@@ -81,6 +81,34 @@ describe('class insights', () => {
   });
 });
 
+describe('real games mixed with sample games', () => {
+  const mixed = classInsights([
+    game('900002', 1, [['Mrsand', '011'], ['Madina', '111']]),
+    game('900001', 2, [['Madina', '100'], ['Bekzod', '000'], ['Zarina', '000']], { sample: true }),
+  ], 'T1');
+  const by = (n: string) => mixed.students.find((s) => s.name === n)!;
+  it('says for each row whether it is made up, so a real student is never shown as sample data or the other way round', () => {
+    assert.equal(mixed.sample, true, 'the class includes sample data');
+    assert.equal(by('Mrsand').sample, false);
+    assert.equal(by('Bekzod').sample, true);
+    assert.equal(by('Madina').sample, true, 'a name that is in a sample game too counts as mixed, to be safe');
+    assert.ok(mixed.questions.every((q) => q.sample === true || q.sample === false));
+    assert.deepEqual(mixed.games.map((g) => g.sample), [false, true]);
+  });
+  it('a real class with no sample games has no flags at all', () => {
+    const real = classInsights([game('1', 1, [['A', '111']])], 'T1');
+    assert.equal(real.sample, false);
+    assert.ok(real.students.every((s) => !s.sample) && real.games.every((g) => !g.sample));
+  });
+  it('the assistant calls an answer sample data only when a row it shows is', async () => {
+    const onlyReal = await assist(fakeModel('{"say":"x","show":"students","who":"all","limit":10}').streamer, { message: 'x', history: [], insights: classInsights([game('1', 1, [['Real', '110']])], 'T1') });
+    assert.equal(onlyReal.sample, undefined);
+    const withSample = await assist(fakeModel('{"say":"x","show":"students","who":"all","limit":10}').streamer, { message: 'x', history: [], insights: mixed });
+    assert.equal(withSample.sample, true);
+    assert.deepEqual(withSample.students!.filter((r) => !r.sample).map((r) => r.name), ['Mrsand']);
+  });
+});
+
 describe('the demo class', () => {
   const ins = classInsights(demoSessions('D', 1_800_000_000_000), 'D');
   it('is the same every time and marked as sample data', () => {

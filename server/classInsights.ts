@@ -20,6 +20,8 @@ export interface StudentInsight {
   trend: 'up' | 'down' | 'flat' | null;
   /** The questions this student missed most often in the last three games (the question texts). */
   missed: string[];
+  /** Some of these numbers come from the demo account's made-up games. */
+  sample: boolean;
 }
 
 export interface QuestionInsight {
@@ -27,6 +29,7 @@ export interface QuestionInsight {
   prompt: string;
   answered: number;
   correctPercent: number;
+  sample: boolean;
 }
 
 export interface GameInsight {
@@ -36,10 +39,11 @@ export interface GameInsight {
   players: number;
   /** Share of all answers in the game that were right; null when nobody answered. */
   accuracy: number | null;
+  sample: boolean;
 }
 
 export interface Insights {
-  /** True when every game counted is demo sample data, not a real class. */
+  /** True when at least one game counted is demo sample data (made up), mixed in with real ones or not. Each row says for itself. */
   sample: boolean;
   students: StudentInsight[];
   questions: QuestionInsight[];
@@ -52,8 +56,8 @@ const pct = (right: number, all: number) => (all > 0 ? Math.round((right / all) 
 
 export function classInsights(history: SessionSummary[], ownerId: string): Insights {
   const mine = history.filter((s) => s.ownerId === ownerId).sort((a, b) => a.finishedAt - b.finishedAt); // oldest first
-  const who = new Map<string, { name: string; rounds: { right: number; answered: number; wrong: string[] }[] }>();
-  const qs = new Map<string, { quizTitle: string; prompt: string; answered: number; right: number }>();
+  const who = new Map<string, { name: string; rounds: { right: number; answered: number; wrong: string[]; sample: boolean }[] }>();
+  const qs = new Map<string, { quizTitle: string; prompt: string; answered: number; right: number; sample: boolean }>();
   let answers = 0, rights = 0;
 
   for (const s of mine) {
@@ -67,7 +71,7 @@ export function classInsights(history: SessionSummary[], ownerId: string): Insig
       if (typeof p.res === 'string' && p.res.length === s.questions.length) {
         for (let i = 0; i < p.res.length; i++) if (p.res[i] === '0') wrong.push(s.questions[i]!.prompt);
       }
-      rec.rounds.push({ right: p.right, answered: p.answered, wrong });
+      rec.rounds.push({ right: p.right, answered: p.answered, wrong, sample: s.sample === true });
       who.set(key, rec);
       answers += p.answered;
       rights += p.right;
@@ -75,10 +79,11 @@ export function classInsights(history: SessionSummary[], ownerId: string): Insig
     for (const q of s.questions) {
       if (!q.answered) continue;
       const key = `${s.quizId}:${q.id}`;
-      const rec = qs.get(key) ?? { quizTitle: s.title, prompt: q.prompt, answered: 0, right: 0 };
+      const rec = qs.get(key) ?? { quizTitle: s.title, prompt: q.prompt, answered: 0, right: 0, sample: false };
       rec.quizTitle = s.title;
       rec.answered += q.answered;
       rec.right += Math.round((q.correctPercent / 100) * q.answered);
+      if (s.sample === true) rec.sample = true;
       qs.set(key, rec);
     }
   }
@@ -96,18 +101,18 @@ export function classInsights(history: SessionSummary[], ownerId: string): Insig
     const missCount = new Map<string, number>();
     for (const round of r.rounds.slice(-3)) for (const w of round.wrong) missCount.set(w, (missCount.get(w) ?? 0) + 1);
     const missed = [...missCount].sort((x, y) => y[1] - x[1]).slice(0, 3).map(([prompt]) => prompt);
-    return { name: r.name, sessions: r.rounds.length, answered, right, accuracy: pct(right, answered), trend, missed };
+    return { name: r.name, sessions: r.rounds.length, answered, right, accuracy: pct(right, answered), trend, missed, sample: r.rounds.some((x) => x.sample) };
   });
 
-  const questions: QuestionInsight[] = [...qs.values()].map((q) => ({ quizTitle: q.quizTitle, prompt: q.prompt, answered: q.answered, correctPercent: pct(q.right, q.answered) }));
+  const questions: QuestionInsight[] = [...qs.values()].map((q) => ({ quizTitle: q.quizTitle, prompt: q.prompt, answered: q.answered, correctPercent: pct(q.right, q.answered), sample: q.sample }));
 
   const games: GameInsight[] = [...mine].reverse().map((s) => {
     const a = s.players.reduce((n, p) => n + p.answered, 0), r = s.players.reduce((n, p) => n + p.right, 0);
-    return { code: s.code, title: s.title, finishedAt: s.finishedAt, players: s.players.length, accuracy: a ? pct(r, a) : null };
+    return { code: s.code, title: s.title, finishedAt: s.finishedAt, players: s.players.length, accuracy: a ? pct(r, a) : null, sample: s.sample === true };
   });
 
   return {
-    sample: mine.length > 0 && mine.every((s) => s.sample === true),
+    sample: mine.some((s) => s.sample === true),
     students,
     questions,
     games,

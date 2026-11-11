@@ -29,14 +29,14 @@ export interface GenRequest {
 }
 export interface GenResult { title: string; subject: string; questions: QuizQuestion[] }
 
-export interface StudentRow { name: string; accuracy: number; answered: number; games: number; trend: StudentInsight['trend']; missed: string[] }
+export interface StudentRow { name: string; accuracy: number; answered: number; games: number; trend: StudentInsight['trend']; missed: string[]; sample: boolean }
 export interface AssistantReply {
   say: string;
   students?: StudentRow[];
   questions?: QuestionInsight[];
   games?: GameInsight[];
   quiz?: GenResult & { game: GameId | null; style: Style };
-  /** The numbers above come from demo sample data. */
+  /** Some of the rows above are demo sample data (each row says so for itself). */
   sample?: boolean;
 }
 export interface AssistRequest {
@@ -239,7 +239,7 @@ export async function assist(streamer: Streamer, req: AssistRequest): Promise<As
 
   if (show === 'students') {
     const who = String(plan?.who ?? 'struggling');
-    reply.students = pickStudents(req.insights, who, limit).map((s) => ({ name: s.name, accuracy: s.accuracy, answered: s.answered, games: s.sessions, trend: s.trend, missed: s.missed }));
+    reply.students = pickStudents(req.insights, who, limit).map((s) => ({ name: s.name, accuracy: s.accuracy, answered: s.answered, games: s.sessions, trend: s.trend, missed: s.missed, sample: s.sample }));
   } else if (show === 'questions') reply.questions = hardestQuestions(req.insights, limit);
   else if (show === 'games') reply.games = req.insights.games.slice(0, limit);
   if (noData && (show === 'students' || show === 'questions' || show === 'games')) {
@@ -249,7 +249,8 @@ export async function assist(streamer: Streamer, req: AssistRequest): Promise<As
     reply.say = 'No student stands out on that yet. Everyone with enough answers is doing fine.';
   }
 
-  if (req.insights.sample && (reply.students || reply.questions || reply.games)) reply.sample = true; // only where made-up numbers are shown
+  // flagged only when a row that is shown has made-up numbers in it
+  if ([...(reply.students ?? []), ...(reply.questions ?? []), ...(reply.games ?? [])].some((r) => r.sample)) reply.sample = true;
 
   const c = plan?.create;
   if (c && typeof c === 'object') {
