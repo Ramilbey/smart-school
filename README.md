@@ -50,7 +50,7 @@ Open http://localhost:8787.
 | `npm run dev` | Vite dev server (5173) plus API/bot server (8787) with hot reload, browser dev auth on |
 | `npm run build` | Builds the Mini App to `dist/` and the server to `dist-server/` |
 | `npm run build:all` | Builds the Mini App, the server and the website in `website/` (into `dist-site/`): everything one server hands out |
-| `npm run sync:website` | Refreshes `website/` from a sibling checkout of the website repository (`../website`); only needed when working on the website |
+| `npm run sync:website` | Maintainer's helper: refreshes `website/` from a separate working checkout at `../website`. Not needed if you edit `website/` directly |
 | `npm start` | Runs the production server: Mini App, API and bot (if a token is set) |
 | `npm run bot` | Runs **only** the bot (long polling), e.g. on a laptop while the Mini App is hosted elsewhere |
 | `npm test` | Unit tests: initData validation, answer checking, hint ladder, AI guardrails, practice generator, content integrity, bot handlers, streak reminders, Grade 6–7 course, homework solver, bot conversations, AI questions in the chat (real SDK over a fake network, no API calls) |
@@ -148,7 +148,7 @@ npm start                # http://localhost:8787
 
 ## Teacher portal (the website)
 
-The website in `website/` (a copy of the website repository, refreshed with `npm run sync:website`) has a **teacher portal** (`teacher.html`) and a **student page** (`play.html`). This server is their back end (`server/portal.ts` and the files it uses). It is separate from the Telegram bot and Mini App: it has its own accounts, and students never need one.
+The website in `website/` has a **teacher portal** (`teacher.html`) and a **student page** (`play.html`). This server is their back end (`server/portal.ts` and the files it uses). It is separate from the Telegram bot and Mini App: it has its own accounts, and students never need one.
 
 **What a teacher can do:** log in (or create an account), make quizzes by hand, from one of the 23 textbook topics (with the textbook pictures), or as an AI draft (Gemini or Claude; topic or pasted text, grade, standard or gamified style, question types), then start a live game and read the results afterwards.
 
@@ -228,7 +228,7 @@ See **[docs/STATUS.md](docs/STATUS.md)** for the full list, including what was t
 smart-schools-app/
 ├── index.html              Mini App entry, Telegram SDK, boot-failure message
 ├── student/                The student area's page (src/student/ holds its code)
-├── website/                The landing page, teacher portal and student game page (a copy of the website repository)
+├── website/                The landing page, teacher portal and student game page (its history, from before it moved here, is kept)
 ├── shared/                 Used by both the client and the server
 │   ├── lessons/            Grade 4 and Grade 7 content (uz/ru/en), quizzes, hint ladders
 │   ├── check.ts            Deterministic answer checking + hint-ladder rules
