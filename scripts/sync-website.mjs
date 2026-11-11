@@ -16,7 +16,7 @@ if (!existsSync(path.join(src, '.git'))) {
   console.error(`${src} is not a git checkout of the website. Set WEBSITE_SRC to it.`);
   process.exit(1);
 }
-const files = execFileSync('git', ['-C', src, 'ls-files', '-z']).toString().split('\0').filter((f) => f && !/^Gemini_Generated/.test(f)); // a stray unused image stays behind
+const files = execFileSync('git', ['-C', src, 'ls-files', '-z']).toString().split('\0').filter((f) => f);
 const dirty = execFileSync('git', ['-C', src, 'status', '--porcelain']).toString().trim();
 if (dirty) console.warn('Note: the website has uncommitted changes. The files are copied as they are on disk now.');
 
