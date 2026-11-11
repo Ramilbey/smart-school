@@ -1,0 +1,360 @@
+/* ============ Clarity pass ============
+   Based on attention research for phone screens:
+   - people look at the upper-left of the content first, so the question goes there;
+   - the question is the largest, highest-contrast text on screen (near-black on warm white, well above WCAG 4.5:1);
+   - only the current task gets the warm accent (isolation / von Restorff effect), everything else stays calm;
+   - answers stay in the lower part of the screen, where the thumb reaches.
+   Also: one typeface family (Onest). No serif italics, no monospace capital-letter labels. */
+
+:root {
+  --q-bg: #fff6e0;
+  --q-line: #f2a516;
+  --q-ink: #7a4300;
+  --q-text: #0b1330;
+}
+
+/* math letters: upright, bold, colour-coded instead of serif italics */
+.formula i,
+.plane .axis-name text,
+.values th,
+.field-label,
+.tagline,
+.break-note {
+  font-style: normal;
+}
+.formula i {
+  font-weight: 700;
+  font-size: 1em;
+  padding: 0 0.02em;
+}
+.plane .axis-name text,
+.values th {
+  font-weight: 700;
+}
+
+/* labels: sentence case, readable size, enough contrast */
+.eyebrow-acad,
+.step-head,
+.quiz-count,
+.eyebrow,
+.sheet-label,
+.status-list dt,
+.badge-kicker,
+.welcome-hello,
+.lang-title,
+.band-lesson b,
+.msg-who,
+.tag-demo,
+.act b,
+.mission-kicker,
+.map-chip,
+.task-num {
+  text-transform: none;
+  letter-spacing: 0;
+}
+.eyebrow-acad,
+.step-head,
+.academic .quiz-count {
+  font-size: 13.5px;
+  color: #3a4366;
+}
+
+/* ---------- the question card ---------- */
+.qcard {
+  position: relative;
+  background: var(--q-bg);
+  border: 2px solid var(--q-line);
+  border-radius: 18px;
+  padding: 13px 16px 15px;
+  box-shadow: 0 10px 22px -16px rgba(122, 67, 0, 0.55);
+}
+.qcard-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--q-ink);
+}
+.qcard-label::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--q-line);
+  flex: none;
+}
+.qcard-label .qcard-count {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+.qcard-context {
+  margin: 0 0 8px;
+  font-size: 15.5px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: #3b3320;
+}
+.qcard-q {
+  margin: 0;
+  font-size: clamp(20px, 5.6vw, 24px);
+  line-height: 1.28;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--q-text);
+}
+.qcard.is-done {
+  --q-bg: #ecf8f3;
+  --q-line: #0f8a72;
+  --q-ink: #0b5e4e;
+}
+
+/* existing question spots get the same treatment */
+.quiz-academic .quiz-prompt {
+  margin: 0 0 4px;
+  padding: 13px 16px 15px;
+  background: var(--q-bg);
+  border: 2px solid var(--q-line);
+  border-radius: 16px;
+  font-size: clamp(20px, 5.6vw, 24px);
+  line-height: 1.28;
+  font-weight: 800;
+  color: var(--q-text);
+}
+.tutor-academic .problem-card .problem-text {
+  margin: 0;
+  padding: 13px 16px 15px;
+  background: var(--q-bg);
+  border: 2px solid var(--q-line);
+  border-radius: 16px;
+  font-size: clamp(18px, 5vw, 21px);
+  line-height: 1.35;
+  font-weight: 800;
+  color: var(--q-text);
+}
+
+/* answers: larger, easier to hit */
+.academic .choice {
+  min-height: 54px;
+  font-size: 17px;
+  font-weight: 600;
+}
+.academic .choice-letter {
+  font-family: var(--font-ui);
+}
+
+/* secondary text under a graph stays quiet */
+.under-plane {
+  margin: 0;
+  text-align: center;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #3a4366;
+}
+
+/* steps: keep the answers on screen under the question (graph a little smaller) */
+.panel-steps-graph {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.panel-steps-graph svg.plane {
+  max-width: min(272px, 74vw);
+}
+.step-card {
+  gap: 10px;
+}
+
+/* ============ Task you can understand without reading ============ */
+.taskcard {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px 10px 10px;
+  background: var(--q-bg);
+  border: 2px solid var(--q-line);
+  border-radius: 18px;
+  box-shadow: 0 10px 22px -16px rgba(122, 67, 0, 0.55);
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.taskcard-pic {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1.5px solid #f3d590;
+  display: grid;
+  place-items: center;
+}
+.goal-pic { width: 46px; height: 46px; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gp-axis { stroke: #c7cbe0; stroke-width: 2; }
+.gp-old { stroke: #1d2b64; stroke-width: 3.2; opacity: 0.35; }
+.gp-goal { stroke: #e08a00; stroke-width: 3.4; stroke-dasharray: 5 4; }
+.gp-turn { stroke: #1d2b64; stroke-width: 2.2; }
+.gp-ring { stroke: #e08a00; stroke-width: 2.6; }
+.gp-dot { fill: #e08a00; stroke: none; }
+.gp-check { stroke: #fff; stroke-width: 5; }
+.taskcard-top { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.taskcard-label { font-size: 13.5px; font-weight: 700; color: var(--q-ink); }
+.taskcard-xp {
+  font-size: 13px; font-weight: 800; color: #fff; background: #0f8a72;
+  padding: 2px 8px; border-radius: 999px; animation: xp-pop 0.5s var(--ease) both;
+}
+.taskcard-dots,
+.dots-row { margin-left: auto; display: flex; gap: 5px; }
+.taskcard-dots i,
+.dots-row i { width: 9px; height: 9px; border-radius: 50%; background: #ecd9ae; transition: width 0.25s var(--ease), background-color 0.25s; }
+.taskcard-dots i.on,
+.dots-row i.on { width: 20px; border-radius: 6px; background: var(--q-line); }
+.taskcard-dots i.done,
+.dots-row i.done { background: #0f8a72; }
+.taskcard-q {
+  margin: 0;
+  font-size: clamp(17px, 4.8vw, 20px);
+  line-height: 1.28;
+  font-weight: 800;
+  color: var(--q-text);
+}
+.taskcard.is-win,
+.taskcard.is-done {
+  --q-bg: #e8f7f1;
+  --q-line: #0f8a72;
+  --q-ink: #0b5e4e;
+}
+.taskcard.is-win .taskcard-pic,
+.taskcard.is-done .taskcard-pic { background: #0f8a72; border-color: #0f8a72; }
+.taskcard.is-win { animation: card-win 0.5s var(--ease); }
+
+/* goal drawn on the graph */
+.plane .line-target {
+  stroke: #e08a00;
+  stroke-width: 3.4;
+  stroke-dasharray: 9 7;
+  stroke-linecap: round;
+  animation: dash-run 1.2s linear infinite;
+}
+.plane .target-ring .ring { fill: none; stroke: #e08a00; }
+.plane .target-ring .ring-3 { stroke-width: 2; opacity: 0.55; transform-box: fill-box; transform-origin: center; animation: ring-pulse 1.4s ease-out infinite; }
+.plane .target-ring .ring-2 { stroke-width: 3; }
+.plane .target-ring .ring-core { fill: #e08a00; }
+.plane .drag-arrow line,
+.plane .drag-arrow path {
+  fill: none;
+  stroke: #e08a00;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.plane .drag-arrow line { stroke-dasharray: 4 5; animation: dash-run 0.8s linear infinite; }
+.plane .drag-arrow { animation: nudge 1.2s ease-in-out infinite; }
+.plane .handle.is-cue .knob { stroke-width: 4.5; }
+.plane .handle.is-cue .hit {
+  fill: rgba(224, 138, 0, 0.16);
+  stroke: #e08a00;
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cue-pulse 1.3s ease-out infinite;
+}
+
+/* success burst */
+.plane .burst-disc { fill: #0f8a72; transform-box: fill-box; transform-origin: center; animation: disc-pop 0.45s var(--ease) both; }
+.plane .burst-check { fill: none; stroke: #fff; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 30; stroke-dashoffset: 30; animation: check-draw 0.35s 0.2s ease-out forwards; }
+.plane .spark { animation: spark-fly 0.8s ease-out forwards; }
+.plane .spark-0 { fill: #f2a516; } .plane .spark-1 { fill: #0f8a72; } .plane .spark-2 { fill: #3d63dd; }
+
+/* XP + streak pill in the top bar */
+.acad-stats { display: inline-flex; align-items: center; gap: 2px; height: 34px; padding: 0 8px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-weight: 800; font-size: 14px; color: #0b1330; font-variant-numeric: tabular-nums; }
+.acad-stat { display: inline-flex; align-items: center; gap: 3px; padding: 0 3px; }
+.acad-stat svg { width: 17px; height: 17px; }
+.acad-stat.xp svg { fill: #f2a516; }
+.acad-stat.streak svg { fill: #c9cfe0; }
+.acad-stat.streak.on svg { fill: #f2600c; }
+
+@keyframes dash-run { to { stroke-dashoffset: -32; } }
+@keyframes ring-pulse { 0% { transform: scale(0.7); opacity: 0.9; } 100% { transform: scale(1.6); opacity: 0; } }
+@keyframes cue-pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes nudge { 50% { transform: translateY(var(--nudge, 0)); opacity: 0.6; } }
+@keyframes disc-pop { from { transform: scale(0.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes check-draw { to { stroke-dashoffset: 0; } }
+@keyframes spark-fly { from { transform: translate(0, 0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+@keyframes xp-pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes card-win { 40% { transform: scale(1.02); } }
+@media (prefers-reduced-motion: reduce) {
+  .plane .line-target, .plane .drag-arrow line, .plane .drag-arrow, .plane .target-ring .ring-3, .plane .handle.is-cue .hit, .taskcard.is-win { animation: none; }
+}
+
+/* ============ Clean navigation ============
+   One calm header line (home · title · stats), one slim section bar without numbers
+   (so it never competes with a step counter), and one counter per screen. */
+.academic .topbar-h,
+.kids .topbar-h { font-size: 16.5px; }
+.academic .topbar { padding-bottom: 6px; }
+
+.seg-bar {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 2px 16px 4px;
+}
+.seg-bar button {
+  flex: 1;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  align-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.seg-bar span {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: #dde2ee;
+  transition: background-color 0.25s, transform 0.25s var(--ease);
+}
+.seg-bar button.done span { background: #0f8a72; }
+.seg-bar button.on span { background: #0b1330; transform: scaleY(1.35); }
+.seg-bar button:focus-visible span { outline: 2px solid #3d63dd; outline-offset: 3px; }
+
+/* variables inside tutor messages */
+.msg-body .mv { font-weight: 800; font-style: normal; padding: 0 0.04em; }
+.msg-body .mv:not(.k):not(.b) { color: #0b1330; }
+
+/* ============ Grade 6–7 textbook course ============ */
+.band-art-emoji { display: grid; place-items: center; font-size: 56px; }
+.course-grades { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; background: #e6e9f3; border-radius: 16px; }
+.course-grades button { height: 44px; border: 0; border-radius: 12px; background: transparent; font-weight: 700; font-size: 16px; color: #3a4366; }
+.course-grades button.on { background: #fff; color: #0b1330; box-shadow: 0 2px 6px rgba(11, 19, 48, 0.12); }
+.course-subject { gap: 8px; }
+.course-book { text-align: left; }
+.course-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.course-item { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 14px; background: #fff; text-align: left; font-weight: 600; font-size: 16px; color: #0b1330; }
+.course-emoji { font-size: 24px; flex: none; width: 32px; text-align: center; }
+.course-name { flex: 1; min-width: 0; line-height: 1.25; }
+.course-stars { flex: none; font-size: 12px; }
+.course-go { flex: none; display: inline-flex; color: #8a93ad; }
+.course-go svg { width: 18px; height: 18px; }
+.course-card { gap: 10px; }
+.course-card-top { display: flex; align-items: center; gap: 10px; }
+.course-pic { width: 100%; border-radius: 12px; overflow: hidden; }
+.course-pic svg { display: block; width: 100%; height: auto; }
+.course-text { margin: 0; white-space: pre-line; font-size: 17px; line-height: 1.5; color: #0b1330; }
+.course-hints { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--q-bg); border: 1px solid var(--q-line); }
+.course-hints p { margin: 0; font-size: 16px; line-height: 1.4; color: var(--q-text); }
+.course-long { grid-template-columns: 1fr !important; }
+.course-skip { display: block; width: 100%; margin-top: 8px; padding: 10px; border: 0; background: none; font-weight: 600; font-size: 15px; color: #3a4366; }
+.course-done { align-items: center; text-align: center; gap: 8px; padding-block: 28px; }
+.course-done-stars { font-size: 40px; letter-spacing: 4px; }
+.course-done-actions { display: flex; flex-direction: column; gap: 8px; }
+
+/* the loading animation on the welcome screen */
+.welcome-loader { display: block; width: 100%; max-width: 360px; height: auto; aspect-ratio: 340 / 240; margin: 0 auto; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent); }

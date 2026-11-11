@@ -1,0 +1,65 @@
+{
+  "voice": "en-US-AvaMultilingualNeural",
+  "clips": {
+    "intro": {
+      "file": "media/shapes/intro.mp3",
+      "text": "This is how a geometry lesson could feel in Smart Schools. Everything stays in your browser, and nothing is recorded. Raise one hand in front of the camera, and hold up three fingers.",
+      "seconds": 12.24
+    },
+    "wait": {
+      "file": "media/shapes/wait.mp3",
+      "text": "I can’t see a hand yet. Raise it a little higher, with the palm toward the camera.",
+      "seconds": 5.47
+    },
+    "nocam": {
+      "file": "media/shapes/nocam.mp3",
+      "text": "No camera? No problem. Press the demo button, and the shapes change by themselves.",
+      "seconds": 6.48
+    },
+    "n0": {
+      "file": "media/shapes/n0.mp3",
+      "text": "A closed fist: a cylinder. It has two flat faces, one curved face, and no corners at all. A circle is like a shape with endless sides.",
+      "seconds": 10.15
+    },
+    "n1": {
+      "file": "media/shapes/n1.mp3",
+      "text": "One finger: a single line. A line has length, but no width and no height.",
+      "seconds": 5.88
+    },
+    "n2": {
+      "file": "media/shapes/n2.mp3",
+      "text": "Two fingers: the base shrinks to a line segment, so the solid becomes a flat sheet, with length and height, and no depth.",
+      "seconds": 8.9
+    },
+    "n4": {
+      "file": "media/shapes/n4.mp3",
+      "text": "Four fingers: a square base, and the height matches the side, so this prism is a cube. Six faces, twelve edges, eight vertices.",
+      "seconds": 9.91
+    },
+    "second": {
+      "file": "media/shapes/second.mp3",
+      "text": "Now use your other hand. Pinch your fingers to make the shape smaller, open them to make it bigger, and flick a finger to spin it.",
+      "seconds": 7.82
+    },
+    "euler": {
+      "file": "media/shapes/euler.mp3",
+      "text": "Look at the numbers. Vertices minus edges plus faces is always two, for every prism you make. In class, Zukko would ask you to check it yourself, and give hints, not answers.",
+      "seconds": 12.55
+    },
+    "n3": {
+      "file": "media/shapes/n3.mp3",
+      "text": "Three fingers: the base has three sides, so this is a triangular prism. Five faces, nine edges, six vertices.",
+      "seconds": 8.69
+    },
+    "n5": {
+      "file": "media/shapes/n5.mp3",
+      "text": "Five fingers: the base has five sides, so this is a pentagonal prism. Seven faces, fifteen edges, ten vertices.",
+      "seconds": 9.07
+    },
+    "demo": {
+      "file": "media/shapes/demo.mp3",
+      "text": "This is the demo. A pretend hand counts from zero to five, and the shape changes with every finger. Watch the numbers: faces, edges, vertices. With a camera, you choose the shape yourself.",
+      "seconds": 14.42
+    }
+  }
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="shell">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#04050a" />
+    <meta name="description" content="The Smart Schools student area: ask the AI tutor, watch a topic explained on the whiteboard, get homework help step by step, or join your class's live game." />
+    <title>Smart Schools: student area</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <link rel="preload" href="/fonts/Onest-normal-300-800-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Unbounded-normal-300-800-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      html, body { margin: 0; background: #04050a; color: #e9ebf2; font-family: Onest, system-ui, sans-serif; }
+      .boot { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; text-align: center; padding: 24px; box-sizing: border-box; }
+      .boot-spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid rgba(233,235,242,.15); border-top-color: #6fa3ff; animation: s 0.9s linear infinite; }
+      .boot-msg { font-size: 14px; line-height: 1.5; color: rgba(233,235,242,.78); }
+      @keyframes s { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { .boot-spin { animation: none; } }
+    </style>
+  </head>
+  <body>
+    <div id="root"><div class="boot" role="status"><div class="boot-spin" id="boot-spin"></div><div class="boot-msg" id="boot-msg"></div></div></div>
+    <noscript><div class="boot"><p class="boot-msg">Smart Schools needs JavaScript. · Smart Schools uchun JavaScript kerak. · Для Smart Schools нужен JavaScript.</p></div></noscript>
+    <script>
+      // If the page cannot load (bad network, server down), say so instead of a blank screen.
+      (function () {
+        function fail() {
+          if (window.__ssMounted) return;
+          var spin = document.getElementById('boot-spin'), msg = document.getElementById('boot-msg');
+          if (!msg) return;
+          if (spin) spin.style.display = 'none';
+          msg.innerHTML = 'The page could not load. Check your connection and try again.<br>Страница не загрузилась. Проверьте интернет и попробуйте снова.<br>Sahifa yuklanmadi. Internetni tekshirib, qayta urinib ko‘ring.<br><br><button onclick="location.reload()" style="font:inherit;font-weight:600;padding:12px 20px;border-radius:12px;border:0;background:#3d7bff;color:#fff;cursor:pointer">↻ Retry</button>';
+        }
+        window.addEventListener('error', function (e) { if (e && e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) fail(); }, true);
+        setTimeout(fail, 12000);
+      })();
+    </script>
+    <script type="module" src="/src/student/main.tsx"></script>
+  </body>
+</html>

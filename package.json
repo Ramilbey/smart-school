@@ -1,0 +1,45 @@
+{
+  "name": "smart-schools-app",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Smart Schools hackathon prototype: Telegram bot + Mini App (Grades 1–4 gamified, Grades 5–11 visual).",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "vite",
+    "dev:server": "tsx watch server/index.ts",
+    "build": "npm run build:web && npm run build:server",
+    "build:web": "vite build",
+    "build:server": "esbuild server/index.ts --bundle --platform=node --format=esm --target=node20 --outfile=dist-server/index.js --packages=external",
+    "build:site": "node scripts/build-site.mjs",
+    "sync:website": "node scripts/sync-website.mjs",
+    "build:all": "npm run build && npm run build:site",
+    "start": "node dist-server/index.js",
+    "bot": "node dist-server/index.js --bot-only",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "tsx --test tests/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build",
+    "build:loader": "esbuild shared/smartLoader.ts --bundle --format=iife --global-name=SmartLoader --minify --outfile=../loading/smartLoader.iife.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.135.0",
+    "@resvg/resvg-js": "2.6.2",
+    "katex": "^0.19.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/katex": "^0.16.8",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "esbuild": "0.28.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vite": "8.3.4"
+  }
+}
