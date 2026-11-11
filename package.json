@@ -17,7 +17,9 @@
   "dependencies": {
     "@fontsource-variable/geologica": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/onest": "^5.3.1",
     "@fontsource-variable/unbounded": "^5.3.0",
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
     "@mediapipe/tasks-vision": "^0.10.14",
     "gsap": "^3.12.5",
     "qrcode": "^1.5.4",

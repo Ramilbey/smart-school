@@ -14,10 +14,10 @@ const G = { bg: '#050506', line: '#1E1E24', mute: '#8A8A92', dim: '#5B5B63', cre
 const MONO = "'JetBrains Mono Variable','JetBrains Mono',ui-monospace,Menlo,monospace";
 const SANS = "'Geologica Variable',Geologica,system-ui,sans-serif";
 const SYS = {
-  cls: { color: '#2EC4B6', name: 'AI classroom', log: 'AI classroom', status: 'planned' },
-  game: { color: '#8B6CF0', name: 'Classroom games', log: 'Games', status: 'planned' },
+  cls: { color: '#2EC4B6', name: 'AI classroom', log: 'AI classroom', status: 'working' },
+  game: { color: '#8B6CF0', name: 'Classroom games', log: 'Games', status: 'working' },
   hw: { color: '#F59E2B', name: 'Homework helper', log: 'Homework', status: 'working' },
-  tutor: { color: '#4F8BFF', name: 'Personal AI tutor', log: 'AI tutor', status: 'planned' },
+  tutor: { color: '#4F8BFF', name: 'Personal AI tutor', log: 'AI tutor', status: 'working' },
   att: { color: '#F0453A', name: 'Smart attendance', log: 'Attendance', status: 'simulated' },
   dash: { color: '#5BE3A0', name: 'Teacher dashboard', log: 'Dashboard', status: 'working' },
 };

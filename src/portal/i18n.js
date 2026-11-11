@@ -3,7 +3,7 @@ import { fmt } from './ui.js';
 
 export const T = {
   en: {
-    brand: 'Smart Schools', portal: 'Teacher portal', backToSite: 'Back to the site', logout: 'Log out', loading: 'Loading…',
+    brand: 'Smart Schools', portal: 'Teacher portal', overview: 'Overview', viewEditor: 'Quiz editor', viewHost: 'Live game', viewResults: 'Results', teacherLabel: 'Teacher', backToSite: 'Back to the site', studentArea: 'Student area', logout: 'Log out', loading: 'Loading…',
     serverDown: 'Cannot reach the Smart Schools server.',
     serverDownHelp: 'The portal needs the server to be running. In the smart-schools-app folder run “npm run dev”, then reload. This page looks for it at {api}.',
     retry: 'Try again',
@@ -68,6 +68,20 @@ export const T = {
     teamsRace: 'Teams (at least 2)',
     aliveN: '{n} still in', outThisRound: 'Out this round: {names}', mercyNote: 'Everyone missed it, so nobody is out.', stillInLabel: 'Still in', outLabel: 'Out', raceTitle: 'The race',
     youAreOut: 'You are out', outAtQ: 'You lasted until question {n}.', stillIn: '{n} still in', watchWinner: 'Watch the big screen to see who wins.', lastOneYou: 'You are the last one standing!',
+    // reading supports on the student's phone
+    supports: 'Reading help', readAloud: 'Read the question aloud', autoRead: 'Read every question aloud', textSize: 'Text size', sizeN: 'Normal', sizeL: 'Large', sizeXL: 'Extra large', easyFont: 'Easy-read letters', stopReading: 'Stop reading',
+    // the AI assistant and class insights
+    askAi: 'Ask AI', askAiLead: 'Ask about your class, or tell it what to create.', askPlaceholder: 'Who is struggling? Make 6 questions about matrices…', askSend: 'Send',
+    askPrivacy: 'Student names are swapped for codes before anything is sent to the AI. It can make mistakes: read what it writes.',
+    askThinking: 'Thinking…', askIntroTitle: 'What can I help with?', askIntroText: 'I look at the results of your finished games, and I can write questions and start a game for you.',
+    sugg1: 'Who is struggling?', sugg2: 'Which questions were hardest?', sugg3: 'Who is getting worse?', sugg4: 'Make 6 questions about fractions',
+    sugg5: 'Make a gamified quiz about matrices and play it as a race', sugg6: 'Show my recent games',
+    needsAttention: 'Needs attention', hardestTitle: 'Hardest questions', lastGames: 'Recent games', insightsEmpty: 'Run a game with your class and the results will show up here.',
+    noOneStands: 'Nobody stands out yet.', sampleData: 'Sample data', sampleNote: 'This is made-up class data so you can try the assistant. Real games add to it.',
+    answeredN: '{a} answers in {g} games', trendUp: 'getting better', trendDown: 'getting worse', missedLabel: 'Missed', correctPct: '{p}% right', resultsBtn: 'Results', playersCount: '{n} students',
+    openInEditor: 'Open in the editor', playAsLabel: 'Play as', styleLabel: 'Style', styleStandard: 'Standard', styleGamified: 'Gamified', typesLabel: 'Question types',
+    typeChoice: 'Multiple choice', typeTf: 'True or false', typeNumber: 'Number', typeText: 'Short word', kindNumber2: 'number', kindText2: 'word', kindChoice2: 'choice', moreQuestions: '+{n} more questions',
+    aiTopicLong: 'Describe the topic, or paste a text to make questions from', aiTopicLongHint: 'For example: matrices, grade 9. Or paste a paragraph from the textbook.',
     mercyStudent: 'Everyone missed it, so nobody is out.', typeWord: 'Type your answer', teamRace: 'Team race',
   },
 };

@@ -1,8 +1,9 @@
 // The student page: type the game code and a first name, then answer on your own phone. No account, no password.
-import '@fontsource-variable/unbounded';
-import '@fontsource-variable/geologica';
+import '@fontsource-variable/onest';
+import '@fontsource/atkinson-hyperlegible/400.css';
+import '@fontsource/atkinson-hyperlegible/700.css';
 import './portal.css';
-import { api, ApiError, setToken } from './api.js';
+import { api, ApiError, API, setToken } from './api.js';
 import { tr } from './i18n.js';
 import { $, LETTERS, animateLanes, esc, raceHtml, rich, secondsLeft, session, svgImg } from './ui.js';
 
@@ -15,7 +16,7 @@ const teamDot = (t) => (t === null || t === undefined ? '' : `<span style="color
 const S = {
   view: 'boot', // boot | join | game
   code: '', pid: '', name: '', peek: null, peekError: '', team: null, nameInput: '', codeInput: '',
-  st: null, offset: 0, down: false, error: '', busy: false, mine: null, num: '', text: '', qid: '', sending: false,
+  st: null, menu: false, offset: 0, down: false, error: '', busy: false, mine: null, num: '', text: '', qid: '', sending: false,
 };
 
 const stored = () => { try { return JSON.parse(session.get('ss-play', 'null')); } catch { return null; } };
@@ -23,6 +24,89 @@ const save = () => session.set('ss-play', JSON.stringify({ code: S.code, pid: S.
 const forget = () => session.del('ss-play');
 const gameLabel = (x) => tr(x.variant === 'survivor' ? 'survivor' : x.variant === 'race' ? 'race' : x.mode === 'speed' ? 'speed' : 'battle');
 const errText = (e) => (e instanceof ApiError ? (e.status === 0 ? tr('serverDownP') : e.status === 404 ? tr('noGame') : e.message) : String(e?.message ?? e));
+
+/* ---------- reading supports: read aloud, bigger text, easy-read letters (kept on this phone only) ---------- */
+
+const PREFS_KEY = 'ss-play-prefs';
+const prefs = (() => { try { return { size: 0, easy: false, auto: false, ...JSON.parse(localStorage.getItem(PREFS_KEY) || '{}') }; } catch { return { size: 0, easy: false, auto: false }; } })();
+function applyPrefs() {
+  try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* private mode */ }
+  document.documentElement.dataset.size = String(prefs.size);
+  document.documentElement.dataset.easy = prefs.easy ? '1' : '0';
+}
+applyPrefs();
+
+let heard = 0, audioEl = null;
+function stopSpeech() {
+  heard++;
+  try { audioEl?.pause(); } catch { /* nothing playing */ }
+  audioEl = null;
+  try { speechSynthesis.cancel(); } catch { /* no speech on this device */ }
+  document.body.classList.remove('is-reading');
+}
+const plainWords = (t) => String(t ?? '').replace(/<\/?(b|i|sup|sub)>/g, '').replace(/\^/g, ' to the power of ').replace(/[ \t]+/g, ' ').trim();
+/** The question and its answers, in short pieces (the server voice takes up to 320 characters at a time). */
+function questionParts(q) {
+  const parts = [plainWords(q.prompt)];
+  if (q.kind === 'choice' && q.choices) q.choices.forEach((c, j) => parts.push(`${LETTERS[j]}. ${plainWords(c)}`));
+  return parts.flatMap((p) => p.match(/[^.?!]+[.?!]*\s*/g) ?? [p]).map((p) => p.trim().slice(0, 300)).filter(Boolean);
+}
+let serverVoiceAfter = 0; // when the server voice said no (off, busy), the browser's own voice is used for a minute instead of asking again
+async function playServer(text, token) {
+  if (Date.now() < serverVoiceAfter) return false;
+  try {
+    const r = await fetch(`${API}/api/tts`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, lang: 'en' }) });
+    if (!r.ok) { serverVoiceAfter = Date.now() + 60_000; return false; }
+    if (token !== heard) return false;
+    const url = URL.createObjectURL(await r.blob());
+    await new Promise((done, fail) => {
+      const a = new Audio(url);
+      audioEl = a;
+      a.onended = () => done();
+      a.onerror = () => fail(new Error('audio'));
+      a.play().catch(fail);
+    });
+    URL.revokeObjectURL(url);
+    return true;
+  } catch { return false; }
+}
+function playLocal(text, token) {
+  return new Promise((done) => {
+    try {
+      if (!('speechSynthesis' in window) || token !== heard) return done();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      u.onend = u.onerror = () => done();
+      speechSynthesis.speak(u);
+    } catch { done(); }
+  });
+}
+async function readAloud(q) {
+  stopSpeech();
+  const token = heard;
+  document.body.classList.add('is-reading');
+  for (const part of questionParts(q)) {
+    if (token !== heard) return;
+    if (!(await playServer(part, token))) await playLocal(part, token);
+  }
+  if (token === heard) document.body.classList.remove('is-reading');
+}
+let lastRead = '';
+const speakIcon = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h4l5 4v-13l-5 4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.500a8 8 0 0 1 0 11"/></svg>';
+
+function supportsMenu() {
+  const tg = (on) => `aria-pressed="${on}"`;
+  return `<div id="sup" class="sup-menu" role="dialog" aria-label="${esc(tr('supports'))}">
+    <b>${tr('supports')}</b>
+    <button class="sup-row" data-act="sup-auto" ${tg(prefs.auto)}><span>${tr('autoRead')}</span><i class="sw"></i></button>
+    <button class="sup-row" data-act="sup-easy" ${tg(prefs.easy)}><span>${tr('easyFont')}</span><i class="sw"></i></button>
+    <div class="sup-row" role="group" aria-label="${esc(tr('textSize'))}"><span>${tr('textSize')}</span><span class="seg">${['sizeN', 'sizeL', 'sizeXL'].map((k, i) => `<button data-act="sup-size" data-v="${i}" aria-pressed="${prefs.size === i}">${tr(k)}</button>`).join('')}</span></div>
+  </div>`;
+}
+function renderMenu() {
+  document.getElementById('sup')?.remove();
+  if (S.menu) document.body.insertAdjacentHTML('beforeend', supportsMenu());
+}
 
 /* ---------- screens ---------- */
 
@@ -32,8 +116,8 @@ function joinView() {
     : '';
   return `<div class="play">
     <h1 style="font-size:clamp(28px,8vw,40px)">${tr('joinTitle')}</h1>
-    <form class="stack" data-form="join" style="gap:16px">
-      <label class="field"><span>${tr('gameCode')}</span><input type="text" id="code" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]*" value="${esc(S.codeInput)}" style="font:800 30px var(--u);letter-spacing:0.18em;text-align:center" /></label>
+    <form class="card pad-lg stack" data-form="join" style="gap:16px">
+      <label class="field"><span>${tr('gameCode')}</span><input type="text" id="code" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]*" value="${esc(S.codeInput)}" style="font:600 30px var(--u);letter-spacing:0.18em;text-align:center" /></label>
       ${S.peek ? `<p class="mute center"><b style="color:#fff">${esc(S.peek.title)}</b> · ${gameLabel(S.peek)}</p>` : ''}
       ${S.peekError ? `<p class="err center">${esc(S.peekError)}</p>` : ''}
       <label class="field"><span>${tr('yourFirstName')}</span><input type="text" id="name" maxlength="20" autocomplete="given-name" value="${esc(S.nameInput)}" style="font-size:20px" /></label>
@@ -44,7 +128,7 @@ function joinView() {
     </div>`;
 }
 
-const topLine = (st, extra = '') => `<div class="top"><span class="me"><span>${teamDot(st.you.team)}${esc(st.you.name)}</span><span class="pts">${tr('points', { n: st.you.score })}</span></span><span>${extra}</span></div>`;
+const topLine = (st, extra = '') => `<div class="top"><span class="me"><span>${teamDot(st.you.team)}${esc(st.you.name)}</span><span class="pts">${tr('points', { n: st.you.score })}</span></span><span class="row" style="gap:10px"><span>${extra}</span><button class="aa" data-act="sup" aria-label="${esc(tr('supports'))}" aria-expanded="${S.menu}">Aa</button></span></div>`;
 const downBanner = () => (S.down ? `<p class="note center" role="status">${tr('serverDownP')}</p>` : '');
 
 function answerArea(q, locked) {
@@ -91,7 +175,7 @@ function questionView(st) {
   const still = st.alive !== undefined ? `${tr('stillIn', { n: st.alive })} · ` : '';
   return `<div class="play">${topLine(st, `${still}${tr('questionOf', { i: index + 1, n: st.total })} · <b id="tleft" style="color:#fff">…</b>`)}
     <div class="timer"><i id="tbar" style="width:100%"></i></div>${downBanner()}${raceLanes(st)}${last}
-    <p class="prompt">${rich(q.prompt)}</p>${svgImg(q.svg)}
+    <div class="prompt-row"><p class="prompt">${rich(q.prompt)}</p><button class="speak" data-act="read" aria-label="${esc(tr('readAloud'))}">${speakIcon}</button></div>${svgImg(q.svg)}
     ${locked && !speed ? `<p class="mute center" role="status">${tr('locked')}</p>` : ''}
     ${answerArea(q, locked)}</div>`;
 }
@@ -141,6 +225,11 @@ function render() {
   document.title = `${tr('brand')}: ${tr('joinTitle')}`;
   tick();
   animateLanes();
+  renderMenu();
+  const q = S.view === 'game' ? S.st?.question : null;
+  const qid = q ? `${S.st.index ?? ''}:${q.id}` : '';
+  if (qid && qid !== lastRead) { lastRead = qid; stopSpeech(); if (prefs.auto) readAloud(q); }
+  if (!q && lastRead) { lastRead = ''; stopSpeech(); }
   const word = $('#word');
   if (word && !word.disabled && S.view === 'game') { word.focus(); word.setSelectionRange(word.value.length, word.value.length); }
 }
@@ -280,6 +369,11 @@ document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-act]');
   if (!el || el.disabled) return;
   const act = el.dataset.act;
+  if (act === 'sup') { S.menu = !S.menu; return render(); }
+  if (act === 'read') { const q = S.st?.question; if (q) { if (document.body.classList.contains('is-reading')) stopSpeech(); else readAloud(q); } return; }
+  if (act === 'sup-auto') { prefs.auto = !prefs.auto; applyPrefs(); if (!prefs.auto) stopSpeech(); lastRead = ''; return render(); }
+  if (act === 'sup-easy') { prefs.easy = !prefs.easy; applyPrefs(); return render(); }
+  if (act === 'sup-size') { prefs.size = Number(el.dataset.v) || 0; applyPrefs(); return render(); }
   if (act === 'team') { S.team = S.team === Number(el.dataset.i) ? null : Number(el.dataset.i); return render(); }
   if (act === 'leave') return leave();
   if (act === 'pick') { const j = Number(el.dataset.j); S.mine = j; return send({ choice: j }); }

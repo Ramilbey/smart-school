@@ -6,7 +6,7 @@ export const BOT_URL = 'https://t.me/yordamchi_ustoz_ai_bot?start=demo';
 export const T = {
   en: {
     skip: 'Skip', chapters: 'Chapters', motionOn: 'Motion on', motionOff: 'Motion off',
-    nav1: 'How it works', nav2: "Zukko's AI", nav3: 'For teachers', nav4: 'The film', nav5: 'Teacher login',
+    nav1: 'How it works', nav2: "Zukko's AI", nav3: 'For teachers', nav4: 'The film', nav5: 'Teacher login', nav6: 'Student area',
     ctaTop: 'Try it in Telegram', ctaFilm: 'Watch the 1:47 film', ctaBot: 'Open the bot',
     ch0: 'Meet Zukko', ch1: 'Connected campus', ch2: 'The loop', ch3: 'How Zukko thinks', ch4: 'Two ages', ch5: 'Hints', ch6: 'The report', ch7: 'The film', ch8: 'The school', ch9: 'Try it',
     anLead: 'How do we build tomorrow?', anHint: 'Scroll or drag to change your point of view', anView: 'A question of perspective', anResolve: 'Resolve the word', anChange: 'Change perspective', anWord: 'CONNECT',
@@ -23,7 +23,7 @@ export const T = {
     c3t: 'Report', c3d: 'The teacher sees who understood, and the question most of the class missed.',
     brainTag: 'Under the hood', brainTitle: 'The teacher teaches. *The AI fills the gaps.*',
     brainBody: 'Six connected systems. Teachers make quizzes with AI and launch them by QR code, run ready-made classroom games, set homework and take attendance from a photo count. Students get homework hints that never give the answer, and a personal AI tutor. Everything flows into one teacher dashboard.',
-    brainNote: 'Demo data and simulated events, not live activity. Working in the prototype: marking, hints, homework help, the teacher report. Simulated: attendance. Planned: the AI quiz and game maker, QR launch, the private tutor, and local AI inside the school.',
+    brainNote: 'Demo data and simulated events, not live activity. Working in the prototype: the quiz maker, QR launch, seven ready-made games, marking, hints, homework help, results, the teacher report, and a voice tutor and visual explainer that draw on a whiteboard (two prepared lessons work now; any topic needs the AI switched on). Simulated: attendance. Planned: local AI inside the school.',
     agesTitle: 'Two ages. Two ways to touch the lesson.',
     agesBody: 'Grades 1 to 4 walk through a bazaar and learn fractions by cutting real things. Grades 5 to 11 move the picture: drag a slider and watch the line turn.',
     g14: 'Grades 1 to 4', g511: 'Grades 5 to 11',

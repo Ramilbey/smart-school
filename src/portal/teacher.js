@@ -1,6 +1,5 @@
 // The teacher portal: log in, make quizzes (by hand, from a textbook topic, or an AI draft), start a live game and read the results.
-import '@fontsource-variable/unbounded';
-import '@fontsource-variable/geologica';
+import '@fontsource-variable/onest';
 import './portal.css';
 import QRCode from 'qrcode';
 import { api, ApiError, API, setToken } from './api.js';
@@ -19,20 +18,58 @@ const S = {
   topics: null, modal: null,
   host: null, code: '', offset: 0, qr: '', joinBase: store.get('ss-join-base') || location.origin,
   results: null, plan: null,
+  insights: null, chat: [], asking: false,
 };
 
 /* ---------- small pieces ---------- */
 
 const logo = `<svg viewBox="-130 -130 260 260" aria-hidden="true"><path d="M12.5 -89.1 A90 90 0 0 1 89.1 -12.5" stroke="#2DE2C4" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M89.1 12.5 A90 90 0 0 1 12.5 89.1" stroke="#5B8CFF" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M-12.5 89.1 A90 90 0 0 1 -89.1 12.5" stroke="#FF6B5B" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M-89.1 -12.5 A90 90 0 0 1 -12.5 -89.1" stroke="#FFB547" stroke-width="24" fill="none" stroke-linecap="round"/><circle r="20" fill="#e9eeff"/></svg>`;
 
-const topBar = () => `<header class="pt-top">
-  <a class="pt-brand" href="./index.html">${logo}<span>${tr('brand')}</span><small>${tr('portal')}</small></a>
-  <div class="pt-right">
-    ${S.teacher ? `<span class="who">${esc(S.teacher.name)}</span><button class="btn sm ghost" data-act="logout">${tr('logout')}</button>` : ''}
-    <a class="btn sm ghost" href="./index.html">${tr('backToSite')}</a>
-  </div></header>`;
+const ICONS = {
+  home: '<path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/>',
+  quiz: '<rect x="4.5" y="3" width="15" height="18" rx="2.6"/><path d="M8.5 8h7M8.5 11.5h3.5"/>',
+  games: '<rect x="2.8" y="7" width="18.4" height="11" rx="4.6"/><path d="M8 10.2v4.6M5.7 12.5h4.6"/>',
+  results: '<path d="M6 20V10M12 20V4M18 20v-7"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  student: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-4 3.6-6 7-6s6.2 2 7 6"/>',
+  site: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 3.8 5.2 3.8 8.5s-1.2 6.1-3.8 8.5c-2.6-2.4-3.8-5.2-3.8-8.5S9.4 5.9 12 3.5z"/>',
+  ask: '<path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-8l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M12 7.6l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/>',
+  spark: '<path d="M12 2.5l2.2 6 6 2.2-6 2.2L12 19l-2.2-6.1-6-2.2 6-2.2z"/><path d="M19 3v4M17 5h4"/>',
+};
+const ico = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg>`;
+const VIEW_TITLES = { home: 'overview', assistant: 'askAi', editor: 'viewEditor', host: 'viewHost', results: 'viewResults' };
+let lastView = '';
 
-const page = (inner) => `${topBar()}<main>${inner}</main>`;
+/** Before logging in: the aurora and one card. */
+const bare = (inner) => `<div class="bare"><a class="brand" href="./index.html">${logo}<span>${tr('brand')}</span></a><main>${inner}</main>
+  <div class="row"><a class="btn sm ghost" href="./student">${tr('studentArea')}</a><a class="btn sm ghost" href="./index.html">${tr('backToSite')}</a></div></div>`;
+
+/** The page of a logged-in teacher: a sidebar to move around, a header with who is logged in, and the view itself. */
+const page = (inner) => {
+  const enter = S.view !== lastView;
+  lastView = S.view;
+  if (!S.teacher) return bare(inner);
+  return `<div class="frame">
+    <aside class="sb">
+      <a class="brand" href="./index.html" aria-label="${tr('brand')}">${logo}<span>${tr('brand')}</span></a>
+      <nav class="nav" aria-label="${tr('portal')}">
+        <button class="ni ${S.view === 'home' ? 'on' : ''}" data-act="home">${ico('home')}${tr('overview')}</button>
+        ${S.info?.ai ? `<button class="ni ${S.view === 'assistant' ? 'on' : ''}" data-act="assistant">${ico('ask')}${tr('askAi')}</button>` : ''}
+        <button class="ni" data-act="goto" data-id="quizzes">${ico('quiz')}${tr('myQuizzes')}</button>
+        <button class="ni" data-act="goto" data-id="games">${ico('games')}${tr('gamesTitle')}</button>
+        <button class="ni" data-act="goto" data-id="results">${ico('results')}${tr('recent')}</button>
+        <button class="ni cta" data-act="new">${ico('plus')}${tr('newQuiz')}</button>
+      </nav>
+      <div class="foot"><a href="./student">${ico('student')}${tr('studentArea')}</a><a href="./index.html">${ico('site')}${tr('backToSite')}</a></div>
+    </aside>
+    <div class="mc">
+      <header class="hd"><h1>${ico('spark')}${tr(VIEW_TITLES[S.view] || 'portal')}</h1>
+        <div class="right"><div class="usr"><span class="av" aria-hidden="true">${esc(String(S.teacher.name || '?').trim().charAt(0).toUpperCase())}</span><div><b>${esc(S.teacher.name)}</b><i>${tr('teacherLabel')}</i></div></div>
+          <button class="btn sm ghost" data-act="logout">${tr('logout')}</button></div></header>
+      <main class="${enter ? 'enter' : ''}">${inner}</main>
+    </div>
+  </div>`;
+};
 const err = (m) => (m ? `<p class="err" role="alert">${esc(m)}</p>` : '');
 const srcTag = (s) => (s === 'ai' ? `<span class="tag lilac">${tr('sourceAi')}</span>` : s === 'textbook' ? `<span class="tag mint">${tr('sourceTextbook')}</span>` : s === 'template' ? `<span class="tag warm">${tr('sourceTemplate')}</span>` : `<span class="tag">${tr('sourceHand')}</span>`);
 const teamLabel = (n) => tr('team', { n: n + 1 });
@@ -71,6 +108,86 @@ const gameCard = (g) => `<article class="card game-card" style="--tint:${COLORS[
   <div class="actions"><button class="btn sm ${g.template ? '' : 'primary'}" data-act="game" data-id="${g.id}">${tr(g.template ? 'makeGame' : 'useGame')}</button></div>
 </article>`;
 
+/* ---------- class insights and the AI assistant ---------- */
+
+const accClass = (p) => (p < 50 ? 'bad' : p < 70 ? 'mid' : 'good');
+const bar = (p) => `<span class="mini-bar ${accClass(p)}"><i style="width:${Math.max(0, Math.min(100, p))}%"></i></span>`;
+const trendTag = (t) => (t === 'down' ? `<span class="trend down">↓ ${tr('trendDown')}</span>` : t === 'up' ? `<span class="trend up">↑ ${tr('trendUp')}</span>` : '');
+const cut = (t, n) => { const x = plainText(t); return x.length > n ? `${x.slice(0, n - 1)}…` : x; };
+
+const studentRow = (s) => `<div class="srow"><span class="av" aria-hidden="true">${esc(String(s.name).charAt(0).toUpperCase())}</span><div class="grow stack" style="gap:6px">
+  <div class="row between"><b>${esc(s.name)}</b><span class="pcs ${accClass(s.accuracy)}">${s.accuracy}%</span></div>${bar(s.accuracy)}
+  <div class="small dim">${tr('answeredN', { a: s.answered, g: s.games ?? s.sessions })} ${trendTag(s.trend)}</div>
+  ${s.missed?.length ? `<div class="miss"><span class="small dim">${tr('missedLabel')}:</span> ${s.missed.map((m) => `<span class="tag">${esc(cut(m, 46))}</span>`).join('')}</div>` : ''}</div></div>`;
+const questionRow = (q) => `<div class="qrow"><span class="grow">${esc(cut(q.prompt, 90))}</span>${bar(q.correctPercent)}<b class="pcs ${accClass(q.correctPercent)}">${q.correctPercent}%</b></div>`;
+const gameRow = (g) => `<div class="item"><span><b>${esc(g.title)}</b> <span class="mute">· ${new Date(g.finishedAt).toLocaleDateString('en-GB', { dateStyle: 'medium' })} · ${tr('playersCount', { n: g.players })}${g.accuracy === null ? '' : ` · ${tr('correctPct', { p: g.accuracy })}`}</span></span><button class="btn sm" data-act="results" data-code="${g.code}">${tr('resultsBtn')}</button></div>`;
+
+const KIND_WORD = { choice: 'kindChoice2', number: 'kindNumber2', text: 'kindText2' };
+function quizDraft(q, i) {
+  const shown = q.questions.slice(0, 4);
+  return `<div class="draft"><div class="row between"><b>${esc(q.title)}</b><span class="row" style="gap:6px"><span class="tag ${q.style === 'gamified' ? 'lilac' : ''}">${tr(q.style === 'gamified' ? 'styleGamified' : 'styleStandard')}</span><span class="tag">${tr('questionsN', { n: q.questions.length })}</span></span></div>
+    <ol class="draft-list">${shown.map((x) => `<li><span>${esc(cut(x.prompt, 110))}</span><span class="tag">${tr(KIND_WORD[x.kind] || 'kindChoice2')}</span></li>`).join('')}</ol>
+    ${q.questions.length > shown.length ? `<p class="small dim">${tr('moreQuestions', { n: q.questions.length - shown.length })}</p>` : ''}
+    <div class="row"><button class="btn primary sm" data-act="ai-open" data-i="${i}">${tr('openInEditor')}</button><span class="small dim">${tr('playAsLabel')}:</span>
+      ${PLAYABLE.map((g) => `<button class="btn sm ${g.id === q.game ? 'mint' : ''}" data-act="ai-play" data-i="${i}" data-game="${g.id}">${tr(g.id)}</button>`).join('')}</div></div>`;
+}
+
+function replyBlocks(r, i) {
+  if (!r) return '';
+  return `${r.sample ? `<p class="small sample"><span class="tag warm">${tr('sampleData')}</span> ${tr('sampleNote')}</p>` : ''}
+    ${r.students?.length ? `<div class="srows">${r.students.map(studentRow).join('')}</div>` : ''}
+    ${r.questions?.length ? `<div class="qrows">${r.questions.map(questionRow).join('')}</div>` : ''}
+    ${r.games?.length ? `<div class="list">${r.games.map(gameRow).join('')}</div>` : ''}
+    ${r.quiz ? quizDraft(r.quiz, i) : ''}`;
+}
+
+const chatMsg = (m, i) => (m.role === 'teacher'
+  ? `<div class="msg me">${esc(m.text)}</div>`
+  : `<div class="msg ai ${m.error ? 'bad' : ''}"><p>${esc(m.text)}</p>${m.error ? '' : replyBlocks(m.reply, i)}</div>`);
+
+const suggestions = () => `<div class="chips-row">${['sugg1', 'sugg2', 'sugg3', 'sugg4', 'sugg5', 'sugg6'].map((k) => `<button class="chip" data-act="ask" data-key="${k}" ${S.asking ? 'disabled' : ''}>${tr(k)}</button>`).join('')}</div>`;
+
+function assistantView() {
+  const intro = `<div class="intro"><span class="ask-ic big">${ico('ask')}</span><h2>${tr('askIntroTitle')}</h2><p class="mute">${tr('askIntroText')}</p>${suggestions()}</div>`;
+  return page(`<div class="chat-wrap">
+    <div class="chat" id="chat">${S.chat.length ? S.chat.map(chatMsg).join('') : intro}${S.asking ? `<div class="msg ai typing" aria-label="${tr('askThinking')}"><i></i><i></i><i></i></div>` : ''}<div id="chat-end"></div></div>
+    ${S.chat.length ? suggestions() : ''}
+    <form class="composer" data-form="ask"><input type="text" id="ask-input" maxlength="600" placeholder="${esc(tr('askPlaceholder'))}" aria-label="${esc(tr('askAi'))}" autocomplete="off" ${S.asking ? 'disabled' : ''} /><button class="btn primary" type="submit" ${S.asking ? 'disabled' : ''}>${tr('askSend')}</button></form>
+    <p class="small dim center">${tr('askPrivacy')}</p></div>`);
+}
+
+async function askAssistant(text) {
+  const q = String(text ?? '').trim();
+  if (!q || S.asking) return;
+  const history = S.chat.slice(-6).map((m) => ({ role: m.role, text: m.text }));
+  S.chat.push({ role: 'teacher', text: q });
+  S.asking = true; S.view = 'assistant'; S.modal = null; render(); toChatEnd();
+  try {
+    const r = await api.assistant(q, history);
+    S.chat.push({ role: 'assistant', text: r.say, reply: r });
+  } catch (e) { S.chat.push({ role: 'assistant', text: msg(e), error: true }); }
+  S.asking = false; render(); toChatEnd();
+}
+const toChatEnd = () => requestAnimationFrame(() => $('#chat-end')?.scrollIntoView({ block: 'end', behavior: 'smooth' }));
+
+/** The insights shown on the home page, from the saved results (no AI involved). */
+function insightCards() {
+  const ins = S.insights;
+  if (!ins) return '';
+  const sample = ins.sample ? `<span class="tag warm" title="${esc(tr('sampleNote'))}">${tr('sampleData')}</span>` : '';
+  if (!ins.totals.games) return `<div class="card insight-empty"><p class="mute">${tr('insightsEmpty')}</p></div>`;
+  const weak = ins.students.filter((s) => s.answered >= 4 && s.accuracy < 65).sort((a, b) => a.accuracy - b.accuracy).slice(0, 3);
+  const hard = ins.questions.filter((q) => q.answered >= 3).sort((a, b) => a.correctPercent - b.correctPercent).slice(0, 3);
+  return `<div class="insight-grid">
+    <section class="card stack" style="gap:14px"><div class="row between"><h3>${tr('needsAttention')}</h3>${sample}</div>${weak.length ? `<div class="srows">${weak.map(studentRow).join('')}</div>` : `<p class="mute">${tr('noOneStands')}</p>`}</section>
+    <section class="card stack" style="gap:14px"><div class="row between"><h3>${tr('hardestTitle')}</h3>${sample}</div>${hard.length ? `<div class="qrows">${hard.map(questionRow).join('')}</div>` : `<p class="mute">${tr('noOneStands')}</p>`}</section>
+  </div>`;
+}
+
+const askCard = () => (S.info?.ai ? `<section class="ask-card"><div class="ask-head"><span class="ask-ic">${ico('ask')}</span><div><h2>${tr('askAi')}</h2><p class="mute small">${tr('askAiLead')}</p></div></div>
+  <form class="composer" data-form="ask-home"><input type="text" id="ask-home-input" maxlength="600" placeholder="${esc(tr('askPlaceholder'))}" aria-label="${esc(tr('askAi'))}" autocomplete="off" /><button class="btn primary" type="submit">${tr('askSend')}</button></form>
+  ${suggestions()}</section>` : '');
+
 function homeView() {
   const quizCard = (q) => `<article class="card quiz-card">
     <h3>${esc(q.title)}</h3>
@@ -84,14 +201,16 @@ function homeView() {
     ? `<div class="list">${S.history.slice(0, 12).map((g) => `<div class="item"><span><b>${esc(g.title)}</b> <span class="mute">· ${new Date(g.finishedAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })} · ${tr('playersN', { n: g.players })}</span></span><button class="btn sm" data-act="results" data-code="${g.code}">${tr('open')}</button></div>`).join('')}</div>`
     : `<div class="empty">${tr('noResults')}</div>`;
   return page(`<div class="stack">
-    <div class="row between"><h1>${esc(tr('hello', { name: S.teacher.name }))}</h1>
+    <div class="row between"><h2>${esc(tr('hello', { name: S.teacher.name }))}</h2>
       <div class="row"><button class="btn primary" data-act="new">+ ${tr('newQuiz')}</button><button class="btn" data-act="topic-new">${tr('fromTopic')}</button>${S.info.ai ? `<button class="btn" data-act="ai-new">${tr('fromAi')}</button>` : ''}</div></div>
+    ${askCard()}
+    ${insightCards()}
     ${active}
-    <div class="stack" style="gap:6px"><h2>${tr('gamesTitle')}</h2><p class="mute">${tr('gamesHelp')}</p></div>
+    <div class="stack sec-title" id="sec-games" style="gap:6px"><h2>${tr('gamesTitle')}</h2><p class="mute">${tr('gamesHelp')}</p></div>
     <div class="grid games">${GAMES.map(gameCard).join('')}</div>
-    <h2>${tr('myQuizzes')}</h2>
+    <h2 class="sec-title" id="sec-quizzes">${tr('myQuizzes')}</h2>
     ${S.quizzes.length ? `<div class="grid">${S.quizzes.map(quizCard).join('')}</div>` : `<div class="empty">${tr('noQuizzes')}</div>`}
-    <h2>${tr('recent')}</h2>${hist}
+    <h2 class="sec-title" id="sec-results">${tr('recent')}</h2>${hist}
   </div>`);
 }
 
@@ -221,8 +340,10 @@ function modalView() {
       ${err(m.error)}<div class="row"><button class="btn primary" data-act="m-topic-go" ${S.topics && !m.busy ? '' : 'disabled'}>${tr('makeQuestions')}</button><button class="btn ghost" data-act="m-close">${tr('cancel')}</button></div>`;
   } else if (m.type === 'ai') {
     inner = `<h2>${tr('aiTitle')}</h2><div class="note">${tr('aiNote')}</div>
-      <label class="field"><span>${tr('aiTopic')}</span><textarea id="m-ai-topic" rows="3" maxlength="200" placeholder="${esc(tr('aiTopicHint'))}"></textarea></label>
-      <div class="row"><label class="field grow"><span>${tr('topicCount')}</span><input type="number" id="m-count" min="1" max="10" value="5" /></label><label class="field grow"><span>${tr('aiGrade')}</span><input type="number" id="m-grade" min="1" max="11" value="6" /></label></div>
+      <label class="field"><span>${tr('aiTopicLong')}</span><textarea id="m-ai-topic" rows="5" maxlength="4000" placeholder="${esc(tr('aiTopicLongHint'))}"></textarea></label>
+      <div class="row"><label class="field grow"><span>${tr('topicCount')}</span><input type="number" id="m-count" min="1" max="12" value="6" /></label><label class="field grow"><span>${tr('aiGrade')}</span><input type="number" id="m-grade" min="1" max="11" value="6" /></label>
+        <label class="field grow"><span>${tr('styleLabel')}</span><select id="m-style"><option value="standard">${tr('styleStandard')}</option><option value="gamified">${tr('styleGamified')}</option></select></label></div>
+      <div class="field"><span>${tr('typesLabel')}</span><div class="checks">${[['choice', 'typeChoice', true], ['truefalse', 'typeTf', false], ['number', 'typeNumber', false], ['text', 'typeText', false]].map(([v, k, on]) => `<label class="check"><input type="checkbox" data-ty="${v}" ${on ? 'checked' : ''} /> ${tr(k)}</label>`).join('')}</div></div>
       ${err(m.error)}<div class="row"><button class="btn primary" data-act="m-ai-go" ${m.busy ? 'disabled' : ''}>${m.busy ? tr('aiMaking') : tr('makeQuestions')}</button><button class="btn ghost" data-act="m-close">${tr('cancel')}</button></div>`;
   } else if (m.type === 'launch') {
     const g = gameById(m.game);
@@ -258,7 +379,7 @@ function modalView() {
 /* ---------- render ---------- */
 
 function render() {
-  const views = { boot: () => page(`<p class="mute">${tr('loading')}</p>`), down: downView, login: loginView, home: homeView, editor: editorView, host: hostView, results: resultsView };
+  const views = { boot: () => page(`<p class="mute">${tr('loading')}</p>`), down: downView, login: loginView, home: homeView, assistant: assistantView, editor: editorView, host: hostView, results: resultsView };
   app.innerHTML = (views[S.view] || views.home)();
   modalEl.innerHTML = modalView();
   document.title = `${tr('brand')}: ${tr('portal')}`;
@@ -269,8 +390,8 @@ function render() {
 /* ---------- data ---------- */
 
 async function loadHome() {
-  const [me, quizzes, hist] = await Promise.all([api.me(), api.quizzes(), api.history()]);
-  S.teacher = me.teacher; S.active = me.active; S.quizzes = quizzes.quizzes; S.history = hist.sessions;
+  const [me, quizzes, hist, ins] = await Promise.all([api.me(), api.quizzes(), api.history(), api.insights().catch(() => null)]);
+  S.teacher = me.teacher; S.active = me.active; S.quizzes = quizzes.quizzes; S.history = hist.sessions; S.insights = ins?.insights ?? null;
   S.view = 'home';
 }
 
@@ -410,6 +531,7 @@ async function makeFromTemplate() {
 document.addEventListener('submit', (e) => {
   const form = e.target.closest('[data-form]');
   if (form?.dataset.form === 'auth') { e.preventDefault(); doAuth(form); }
+  if (form?.dataset.form === 'ask' || form?.dataset.form === 'ask-home') { e.preventDefault(); askAssistant(form.querySelector('input[type=text]').value); }
 });
 
 document.addEventListener('input', (e) => {
@@ -458,6 +580,16 @@ document.addEventListener('click', async (e) => {
     case 'toggle-mode': S.mode = S.mode === 'register' ? 'login' : 'register'; S.error = ''; return render();
     case 'demo': { const d = S.info.demo; S.busy = true; render(); try { const r = await api.login(d.username, d.password); store.set('ss-portal-token', r.token); setToken(r.token); S.teacher = r.teacher; await loadHome(); } catch (er) { S.error = msg(er); } S.busy = false; return render(); }
     case 'home': S.plan = null; return goHome();
+    case 'assistant': S.plan = null; stopPolling(); S.modal = null; S.view = 'assistant'; render(); toChatEnd(); return;
+    case 'ask': return askAssistant(tr(el.dataset.key));
+    case 'ai-open': case 'ai-play': {
+      const d = S.chat[Number(el.dataset.i)]?.reply?.quiz; if (!d) return;
+      S.quiz = newQuiz({ title: d.title, subject: d.subject || '', lang: 'en', source: 'ai', questions: JSON.parse(JSON.stringify(d.questions)) });
+      S.plan = null; S.dirty = true; S.error = ''; S.notice = tr('aiNote'); S.view = 'editor';
+      S.modal = act === 'ai-play' ? { type: 'launch', game: el.dataset.game } : null;
+      render(); window.scrollTo(0, 0); return;
+    }
+    case 'goto': { S.plan = null; if (S.view !== 'home') await goHome(); document.getElementById(`sec-${el.dataset.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     case 'new': S.quiz = newQuiz(); S.plan = null; S.modal = null; S.dirty = false; S.error = ''; S.notice = ''; S.view = 'editor'; return render();
     case 'edit': try { S.quiz = (await api.quiz(el.dataset.id)).quiz; S.plan = null; S.dirty = false; S.error = ''; S.notice = ''; S.view = 'editor'; } catch (er) { alert(msg(er)); } return render();
     case 'del': if (confirm(tr('confirmDel', { title: el.dataset.title }))) { try { await api.deleteQuiz(el.dataset.id); await loadHome(); } catch (er) { alert(msg(er)); } render(); } return;
@@ -504,8 +636,9 @@ document.addEventListener('click', async (e) => {
       const topic = $('#m-ai-topic').value.trim(); if (topic.length < 3) { S.modal.error = tr('aiTopicHint'); return render(); }
       const lang = 'en'; S.modal.busy = true; S.modal.error = ''; render();
       try {
-        const r = await api.genAi(topic, Number($('#m-count').value), lang, Number($('#m-grade').value));
-        if (S.modal.target === 'new' || !S.quiz) { S.quiz = newQuiz({ title: topic.slice(0, 60), lang, source: 'ai', questions: r.questions }); S.view = 'editor'; } else { if (S.quiz.questions.length === 1 && !S.quiz.questions[0].prompt.trim()) S.quiz.questions = []; S.quiz.questions.push(...r.questions); if (S.quiz.source === 'hand') S.quiz.source = 'ai'; }
+        const types = $$('[data-ty]').filter((x) => x.checked).map((x) => x.dataset.ty);
+        const r = await api.genAi(topic, Number($('#m-count').value), lang, Number($('#m-grade').value), { style: $('#m-style').value, types: types.length ? types : ['choice'] });
+        if (S.modal.target === 'new' || !S.quiz) { S.quiz = newQuiz({ title: r.title || topic.slice(0, 60), subject: r.subject || '', lang, source: 'ai', questions: r.questions }); S.view = 'editor'; } else { if (S.quiz.questions.length === 1 && !S.quiz.questions[0].prompt.trim()) S.quiz.questions = []; S.quiz.questions.push(...r.questions); if (S.quiz.source === 'hand') S.quiz.source = 'ai'; }
         S.notice = `${tr('someAdded', { n: r.questions.length })} ${tr('aiNote')}`; S.dirty = true; S.modal = null;
       } catch (er) { S.modal.error = msg(er); S.modal.busy = false; }
       return render();
