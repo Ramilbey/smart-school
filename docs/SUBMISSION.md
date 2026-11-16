@@ -18,7 +18,7 @@ Base address: **https://smart-schools.163-245-192-206.sslip.io**
 | **Teacher portal** | `/teacher` | Press **Use the demo teacher** (account `ustoz`, password `ustoz2026`), or create an account |
 | Student game page | `/play` | Opened by a student with a teacher's 6-digit code |
 | Telegram bot | **@yordamchi_ustoz_ai_bot** | Textbook lessons for Grades 6–7, practice with hints, step-by-step homework help, daily problem, progress. The menu button opens the Mini App |
-| Telegram Mini App | `/app/` (or the bot's menu button) | Grades 1–4 fractions game; Grades 5–11 linear functions; teacher report |
+| Telegram Mini App | `/app/` (or the bot's menu button) | Opens the student area inside Telegram (one product, one design). `/app/?go=teacher` opens the teacher's class view with the Smart Attendance demo |
 
 ### A five-minute route
 
@@ -37,7 +37,7 @@ Base address: **https://smart-schools.163-245-192-206.sslip.io**
 - **Own progress**, kept on the student's device only: lessons, questions, solved problems, games, time, topic progress, a topic map.
 - **Join a game** from the student area or `/play`.
 - **Telegram bot** with 23 Grade 6–7 textbook topics, generated practice with a four-rung hint ladder, step-by-step homework solver, daily problem, streak reminders, and an AI chat tutor for free-form questions (Uzbek, Russian, English) with a guard that refuses to hand out homework answers.
-- **Mini App**: a Grade 4 fractions game (five stations, XP, badges) and a Grade 7 linear-function lab (drag the line, watch graph, table and equation move together).
+- **Mini App**: inside Telegram it opens the same student area as the website, and the bot's deep links land on the matching page (Grades 1–4 games, a lesson, the tutor). The Grade 4 fractions adventure and the Grade 7 linear-function lab are pages of the student area.
 
 **Teachers**
 - Accounts, quizzes by hand, from 23 textbook topics (with the textbook pictures), or **drafted by AI** from a topic or a pasted text (grade, standard or gamified style, question types: multiple choice, true or false, number, short word).
@@ -67,7 +67,7 @@ Stated plainly, so nothing here is oversold:
 - **The school-server design is planned, not built.** The product idea is a server in every school with its own Wi-Fi and AI running inside it, so lessons work without the internet and student data stays in the school. Today everything runs on one cloud server, and Telegram is used only as the prototype's channel.
 - **Uzbek and Russian text is a draft.** It has not been reviewed by a native-speaking teacher. Lesson content is written in our own words from the textbooks' topics and is marked as awaiting teacher review.
 - **Demo numbers are labelled.** The Mini App's teacher class view and the demo teacher's class results are sample data, marked as such in the screens.
-- **Camera headcount, real roster integration and teacher approval** are simulated in the Mini App's teacher view.
+- **Camera headcount, real roster integration and teacher approval** are simulated in the Mini App's teacher view (`/app/?go=teacher`).
 - **The AI can make mistakes.** The free Gemini tier is used for the demo; its terms allow Google to use prompts, which is why names are replaced by codes. A school deployment would use an agreement or a local model.
 - **The Grades 1–4 games keep their results on the child's device.** The skills map is not sent to the teacher yet; joining it to the teacher's class insights is the next step. The number-line game follows published research on linear number board games; the other five use common classroom methods (ten-frames, base-ten blocks, arrays, fraction bars, bar models) and have not been trialled with pupils.
 - **Students join games with a first name only**, so two students with the same name count as one in the class insights.

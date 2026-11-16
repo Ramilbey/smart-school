@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#04050a" />
     <meta name="description" content="The Smart Schools student area: ask the AI tutor, watch a topic explained on the whiteboard, get homework help step by step, or join your class's live game." />
     <title>Smart Schools: student area</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?64"></script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/fonts/fonts.css" />
     <link rel="preload" href="/fonts/Onest-normal-300-800-latin.woff2" as="font" type="font/woff2" crossorigin />
@@ -32,7 +33,7 @@
           if (spin) spin.style.display = 'none';
           msg.innerHTML = 'The page could not load. Check your connection and try again.<br>Страница не загрузилась. Проверьте интернет и попробуйте снова.<br>Sahifa yuklanmadi. Internetni tekshirib, qayta urinib ko‘ring.<br><br><button onclick="location.reload()" style="font:inherit;font-weight:600;padding:12px 20px;border-radius:12px;border:0;background:#3d7bff;color:#fff;cursor:pointer">↻ Retry</button>';
         }
-        window.addEventListener('error', function (e) { if (e && e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) fail(); }, true);
+        window.addEventListener('error', function (e) { if (e && e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK') && String(e.target.src || '').indexOf('telegram.org') === -1) fail(); }, true);
         setTimeout(fail, 12000);
       })();
     </script>
