@@ -14,6 +14,7 @@ Base address: **https://smart-schools.163-245-192-206.sslip.io**
 |---|---|---|
 | Landing page | `/` | The scroll story and the AI hub |
 | **Student area** | `/student` | No login. AI tutor, "watch it explained", homework helper, join a game |
+| **Games for Grades 1–4** | `/student#/arcade` | Six short games, no login. The level follows the child, a wrong answer gets an explanation, a skills map shows the gaps |
 | **Teacher portal** | `/teacher` | Press **Use the demo teacher** (account `ustoz`, password `ustoz2026`), or create an account |
 | Student game page | `/play` | Opened by a student with a teacher's 6-digit code |
 | Telegram bot | **@yordamchi_ustoz_ai_bot** | Textbook lessons for Grades 6–7, practice with hints, step-by-step homework help, daily problem, progress. The menu button opens the Mini App |
@@ -31,6 +32,7 @@ Base address: **https://smart-schools.163-245-192-206.sslip.io**
 
 **Students**
 - **AI tutor and visual explainer.** Streams a lesson as "beats": a short sentence, spoken, plus drawings (formulas, shapes, graphs) that appear as it speaks. Any school topic; two prepared lessons work even with the AI off. Interrupt with text or voice. Spoken in English, Russian and Uzbek by a server voice (neural text-to-speech, cached), with the browser's voice and then reading speed as fallbacks.
+- **Games for Grades 1–4** (Play → Games). Six gamified lessons, each aimed at one thing young pupils get stuck on: number line (how big a number is), make ten (adding without counting on fingers), build the number (place value), rows and columns (multiplication as equal rows), which is bigger (the "bigger denominator, bigger fraction" mistake) and story pictures (choosing a bar model before calculating a word problem). Three right answers in a row raise the level, two wrong lower it. A wrong answer is matched to the mistake behind it and gets a sentence and a picture about that mistake, then a second try. Every first try feeds a skills map (strong, practising, needs help), kept on the device.
 - **Homework helper.** A deterministic solver (equations, fractions, brackets, percentages, powers). Every step is computed by code, not guessed by an AI, and shown one at a time, answer last.
 - **Own progress**, kept on the student's device only: lessons, questions, solved problems, games, time, topic progress, a topic map.
 - **Join a game** from the student area or `/play`.
@@ -46,7 +48,7 @@ Base address: **https://smart-schools.163-245-192-206.sslip.io**
 **Platform**
 - One Node server hands out the website, the student area, the Mini App, the teacher portal and the API, and runs the bot. A systemd service behind nginx with HTTPS, on a 1 vCPU / 2 GB VPS.
 - UI in Uzbek (Latin), Russian and English.
-- 237 server and shared-code tests plus 5 for the website (`npm test`), clean typecheck, a build from a fresh clone, and a Dockerfile.
+- 245 server and shared-code tests plus 5 for the website (`npm test`), clean typecheck, a build from a fresh clone, and a Dockerfile.
 - Nightly backup of accounts, quizzes and results; AI usage caps per person and for everyone; rate limits on login and joining.
 
 ## How the AI is kept honest and private
@@ -67,6 +69,7 @@ Stated plainly, so nothing here is oversold:
 - **Demo numbers are labelled.** The Mini App's teacher class view and the demo teacher's class results are sample data, marked as such in the screens.
 - **Camera headcount, real roster integration and teacher approval** are simulated in the Mini App's teacher view.
 - **The AI can make mistakes.** The free Gemini tier is used for the demo; its terms allow Google to use prompts, which is why names are replaced by codes. A school deployment would use an agreement or a local model.
+- **The Grades 1–4 games keep their results on the child's device.** The skills map is not sent to the teacher yet; joining it to the teacher's class insights is the next step. The number-line game follows published research on linear number board games; the other five use common classroom methods (ten-frames, base-ten blocks, arrays, fraction bars, bar models) and have not been trialled with pupils.
 - **Students join games with a first name only**, so two students with the same name count as one in the class insights.
 - **Not verified on every device.** The live voice and microphone were checked in desktop browsers; the microphone needs a browser with speech recognition (not Firefox, and not every Telegram web view). Real-phone checks inside Telegram are still to do.
 - Games in progress are kept in memory: a server restart ends running games (quizzes, results and accounts are saved).

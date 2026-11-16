@@ -2,7 +2,9 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Logo } from '../components/Brand.tsx';
 import { useStore } from '../lib/store.tsx';
 import type { Lang } from '../../shared/types.ts';
+import { Arcade } from './arcade/Arcade.tsx';
 import { Game } from './Game.tsx';
+import { Lessons } from './lessons/Lessons.tsx';
 import { Home } from './Home.tsx';
 import { Homework } from './Homework.tsx';
 import { Ico } from './icons.tsx';
@@ -13,15 +15,23 @@ import { useActivity } from './useActivity.ts';
 // the whiteboard screens bring a maths typesetter with them, so they load only when opened
 const TutorScreen = lazy(() => import('../screens/tutor/BoardScreen.tsx').then((m) => ({ default: m.TutorScreen })));
 const ExplainerScreen = lazy(() => import('../screens/tutor/BoardScreen.tsx').then((m) => ({ default: m.ExplainerScreen })));
+// the older practice sections bring their own screens and styles, so they load only when opened
+const Legacy = lazy(() => import('./Legacy.tsx').then((m) => ({ default: m.Legacy })));
 
-type Item = { name: RouteName; icon: 'home' | 'tutor' | 'explain' | 'homework' | 'game'; label: StKey; side: StKey; title: StKey; sub: StKey };
+type Item = { name: RouteName; icon: 'home' | 'tutor' | 'explain' | 'homework' | 'game' | 'star' | 'pie' | 'graph' | 'book'; label: StKey; side: StKey; title: StKey; sub: StKey };
 const NAV: Item[] = [
   { name: 'home', icon: 'home', label: 'navHome', side: 'overview', title: 'overview', sub: 'subHome' },
   { name: 'tutor', icon: 'tutor', label: 'navTutor', side: 'navTutor', title: 'navTutorLong', sub: 'subTutor' },
   { name: 'explain', icon: 'explain', label: 'navExplain', side: 'navExplain', title: 'navExplainLong', sub: 'subExplain' },
   { name: 'homework', icon: 'homework', label: 'navHomework', side: 'navHomework', title: 'navHomeworkLong', sub: 'subHomework' },
   { name: 'game', icon: 'game', label: 'navGame', side: 'navGameLong', title: 'navGameLong', sub: 'subGame' },
+  { name: 'arcade', icon: 'star', label: 'tabArcade', side: 'navArcade', title: 'navArcade', sub: 'subArcade' },
+  { name: 'fractions', icon: 'pie', label: 'moreFractions', side: 'moreFractions', title: 'moreFractions', sub: 'moreFractionsSub' },
+  { name: 'linear', icon: 'graph', label: 'moreLinear', side: 'moreLinear', title: 'moreLinear', sub: 'moreLinearSub' },
+  { name: 'lessons', icon: 'book', label: 'moreLessons', side: 'moreLessons', title: 'moreLessons', sub: 'moreLessonsSub' },
 ];
+/** The bottom bar on a phone has room for five. */
+const PHONE: RouteName[] = ['home', 'tutor', 'explain', 'homework', 'arcade'];
 const byName = (n: RouteName) => NAV.find((x) => x.name === n)!;
 const LANGS: Lang[] = ['en', 'ru', 'uz'];
 const LEARN: RouteName[] = ['home', 'tutor', 'explain', 'homework'];
@@ -87,6 +97,9 @@ export function StudentApp() {
   if (route.name === 'home') page = <Home activity={activity} aiOn={aiOn} />;
   else if (route.name === 'homework') page = <Homework />;
   else if (route.name === 'game') page = <Game initialCode={route.params.get('code') ?? ''} />;
+  else if (route.name === 'arcade') page = <Arcade game={route.params.get('g')} />;
+  else if (route.name === 'lessons') page = <Lessons topicId={route.params.get('t')} />;
+  else if (route.name === 'fractions' || route.name === 'linear') page = <Suspense fallback={<Skeleton explainer={false} label={t('loading')} />}><Legacy key={route.name} section={route.name} /></Suspense>;
   else if (route.name === 'tutor') page = <Suspense fallback={<Skeleton explainer={false} label={t('loading')} />}><TutorScreen key={`t${q}${sid}`} embedded initialTopic={q} initialSample={sid} /></Suspense>;
   else page = <Suspense fallback={<Skeleton explainer label={t('loading')} />}><ExplainerScreen key={`e${q}${sid}`} embedded initialTopic={q} initialSample={sid} /></Suspense>;
 
@@ -117,10 +130,14 @@ export function StudentApp() {
               <>{LEARN.map((n) => link(byName(n)))}</>
             ) : (
               <>
+                <a href={href('arcade')} className="st-link st-link-hi" aria-current={route.name === 'arcade' ? 'page' : undefined}>
+                  <Ico name="star" size={22} sw={1.6} />
+                  <span>{t('navArcade')}</span>
+                </a>
                 {link(byName('game'))}
-                <a className="st-link" href="../?go=g4"><Ico name="pie" size={22} sw={1.6} /><span>{t('moreFractions')}</span></a>
-                <a className="st-link" href="../?go=g7"><Ico name="graph" size={22} sw={1.6} /><span>{t('moreLinear')}</span></a>
-                <a className="st-link" href="../?go=course"><Ico name="book" size={22} sw={1.6} /><span>{t('moreLessons')}</span></a>
+                {link(byName('fractions'))}
+                {link(byName('linear'))}
+                {link(byName('lessons'))}
               </>
             )}
           </nav>
@@ -148,7 +165,7 @@ export function StudentApp() {
       </div>
 
       <nav className="st-tabs" aria-label={t('area')}>
-        {NAV.map((n) => (
+        {PHONE.map(byName).map((n) => (
           <a key={n.name} href={href(n.name)} className="st-tab" aria-current={n.name === route.name ? 'page' : undefined}>
             <Ico name={n.icon} size={22} sw={1.7} />
             <span>{t(n.label)}</span>

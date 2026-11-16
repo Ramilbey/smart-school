@@ -1,0 +1,119 @@
+/* ============ Textbook lessons: the modern look (aurora glass, light-on-dark figures) ============ */
+.ls-chip { display: inline-flex; align-items: center; height: 28px; padding: 0 13px; border-radius: 999px; font: 700 13px var(--font-ui); color: #1a0a00; background: color-mix(in srgb, var(--c, #6fa3ff) 90%, #fff); }
+.ls-note { font-size: 13px; line-height: 1.5; color: var(--st-mute); }
+.ls-stars { display: inline-flex; gap: 2px; }
+.ls-stars svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, 0.14); }
+.ls-stars svg.on { fill: #ffc46b; }
+
+/* ----- browse ----- */
+.ls-hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 34px; align-items: center; padding: 30px 34px; background: radial-gradient(90% 140% at 0% 0%, color-mix(in srgb, var(--c) 26%, transparent), transparent 62%), var(--st-glass); }
+.ls-hero h2 { font: 300 clamp(28px, 2.8vw, 42px)/1.1 var(--font-ui); letter-spacing: -0.015em; margin: 14px 0 6px; }
+.ls-hero .st-lead { color: #fff; font-weight: 600; font-size: 20px; }
+.ls-hero-q { margin: 12px 0 22px; max-width: 560px; font: 400 17px/1.55 var(--font-ui); color: var(--st-ink2); }
+.ls-hero .st-main-btn { gap: 8px; text-decoration: none; }
+.ls-lead-side { font-size: 16px; line-height: 1.6; color: var(--st-ink2); padding-left: 28px; border-left: 1px solid var(--st-line); }
+.ls-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.ls-tabs button { display: grid; gap: 8px; text-align: left; padding: 16px 18px; border-radius: 18px; border: 1px solid var(--st-line); background: rgba(255, 255, 255, 0.04); color: #fff; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.2s; }
+.ls-tabs button:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.07); }
+.ls-tabs button[aria-pressed='true'] { border-color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); box-shadow: 0 0 34px color-mix(in srgb, var(--c) 22%, transparent); }
+.ls-tabs b { font: 600 16px var(--font-ui); }
+.ls-tabs span { display: block; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+.ls-tabs span i { display: block; height: 100%; border-radius: 3px; background: var(--c); }
+.ls-tabs em { font-style: normal; font-size: 13px; color: var(--st-mute); }
+.ls-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.ls-topic { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; padding: 20px 22px; transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; }
+.ls-topic:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--c) 60%, transparent); box-shadow: var(--st-shadow), 0 0 36px color-mix(in srgb, var(--c) 18%, transparent); }
+.ls-topic.next { border-color: color-mix(in srgb, var(--c) 70%, transparent); }
+.ls-num { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; font: 700 14px var(--font-ui); color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); margin-bottom: 8px; }
+.ls-topic h3 { font: 600 19px/1.25 var(--font-ui); }
+.ls-place { font-size: 14px; color: var(--st-ink2); flex: 1; }
+.ls-topic-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.ls-go { display: inline-flex; align-items: center; gap: 6px; font: 700 13.5px var(--font-ui); color: var(--c); }
+
+/* ----- a lesson ----- */
+.ls-lesson { grid-template-columns: minmax(0, 1fr) 300px; align-items: start; }
+.ls-stage { display: flex; flex-direction: column; min-height: min(720px, calc(100dvh - 180px)); padding: 22px 28px 24px; }
+.ls-head { display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--st-line); }
+.ls-back { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--st-line); color: var(--st-ink2); transform: scaleX(-1); flex: none; }
+.ls-back:hover { color: #fff; background: rgba(255, 255, 255, 0.07); }
+.ls-title { display: grid; min-width: 0; }
+.ls-title b { font: 600 20px var(--font-ui); }
+.ls-title span { font-size: 13.5px; color: var(--st-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ls-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 22px 0 12px; animation: lsIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes lsIn { from { opacity: 0; transform: translateY(10px); } }
+.ls-hook { max-width: 780px; margin: 0 auto; display: grid; gap: 22px; }
+.ls-hook .ls-chip { justify-self: start; }
+.ls-hook h2 { font: 300 clamp(26px, 2.6vw, 38px)/1.28 var(--font-ui); letter-spacing: -0.01em; }
+.ls-answer { padding: 18px 22px; border-radius: 18px; background: color-mix(in srgb, var(--c) 12%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); }
+.ls-answer small { display: block; font: 600 13px var(--font-ui); color: var(--c); margin-bottom: 6px; }
+.ls-answer p { font: 500 19px/1.5 var(--font-ui); }
+.ls-card { display: grid; gap: 22px; max-width: 880px; width: 100%; margin: 0 auto; }
+.ls-card.with-fig { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; max-width: none; }
+.ls-fig { margin: 0; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12); background: linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px) 0 0 / 100% 32px, linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px) 0 0 / 32px 100%, radial-gradient(120% 120% at 50% 0%, rgba(111, 163, 255, 0.14), rgba(255, 255, 255, 0.02)); padding: 10px; overflow: hidden; }
+.ls-fig svg { display: block; width: 100%; height: auto; }
+.ls-text { font: 400 clamp(16px, 1.25vw, 19px)/1.65 var(--font-ui); color: #e9ebf2; }
+.ls-text b { color: color-mix(in srgb, var(--c) 78%, #fff); font-weight: 700; }
+.ls-foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-top: 16px; border-top: 1px solid var(--st-line); }
+.ls-foot.center { justify-content: center; border: 0; margin-top: 20px; flex-wrap: wrap; }
+.ls-foot .st-main-btn { gap: 8px; text-decoration: none; }
+.ls-ghost { display: inline-flex; align-items: center; height: 50px; padding: 0 22px; border-radius: 13px; border: 1px solid var(--st-line); background: transparent; color: var(--st-ink2); font: 600 15px var(--font-ui); cursor: pointer; text-decoration: none; }
+.ls-ghost:hover:not(:disabled) { color: #fff; background: rgba(255, 255, 255, 0.07); }
+.ls-ghost:disabled { opacity: 0.3; cursor: default; }
+.ls-ghost.sm { height: 38px; padding: 0 16px; font-size: 14px; }
+.ls-side { display: grid; gap: 18px; position: sticky; top: 6px; }
+.ls-side h3 { margin-bottom: 12px; }
+.ls-path { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.ls-path button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 42px; padding: 4px 8px; border: 0; border-radius: 12px; background: transparent; color: var(--st-ink2); font: 500 15px var(--font-ui); cursor: pointer; text-align: left; }
+.ls-path button:hover { background: rgba(255, 255, 255, 0.06); }
+.ls-path .dot { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font: 700 12.5px var(--font-ui); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); flex: none; }
+.ls-path .now button { color: #fff; background: rgba(255, 255, 255, 0.07); }
+.ls-path .now .dot { background: var(--c); border-color: var(--c); color: #1a0a00; box-shadow: 0 0 16px color-mix(in srgb, var(--c) 60%, transparent); }
+.ls-path .past .dot { background: color-mix(in srgb, #2fd39c 30%, transparent); border-color: #2fd39c; color: #2fd39c; }
+.ls-place-card p { font-size: 15px; color: var(--st-ink2); line-height: 1.5; }
+
+/* ----- practice ----- */
+.ls-quiz { gap: 18px; justify-content: flex-start; }
+.ls-qtop { display: flex; align-items: center; justify-content: space-between; gap: 14px; font-size: 14px; color: var(--st-mute); }
+.ls-prog { display: flex; gap: 6px; }
+.ls-prog i { width: 30px; height: 7px; border-radius: 4px; background: rgba(255, 255, 255, 0.12); }
+.ls-prog i.now { background: #fff; box-shadow: 0 0 12px rgba(255, 255, 255, 0.6); }
+.ls-prog i.first { background: #2fd39c; } .ls-prog i.second { background: #ffb84d; } .ls-prog i.shown { background: #ff7d6e; }
+.ls-q { font: 400 clamp(19px, 1.7vw, 25px)/1.45 var(--font-ui); }
+.ls-quiz .ls-fig { max-width: 520px; align-self: center; width: 100%; }
+.ls-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.ls-choices.long { grid-template-columns: minmax(0, 1fr); }
+.ls-choice { min-height: 62px; padding: 10px 18px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.05); color: #fff; font: 600 20px var(--font-ui); cursor: pointer; transition: transform 0.15s, background 0.2s, border-color 0.2s; }
+.ls-choice:hover:not(:disabled) { transform: translateY(-2px); background: color-mix(in srgb, var(--c) 18%, transparent); border-color: var(--c); }
+.ls-choice:disabled { cursor: default; }
+.ls-choice.wrong { background: rgba(255, 125, 110, 0.16); border-color: #ff7d6e; opacity: 0.8; }
+.ls-choice.right { background: rgba(47, 211, 156, 0.22); border-color: #2fd39c; box-shadow: 0 0 26px rgba(47, 211, 156, 0.3); }
+.ls-choice.dim { opacity: 0.4; }
+.ls-fb { display: grid; gap: 8px; align-content: start; min-height: 74px; padding: 14px 18px; border-radius: 16px; border: 1px solid transparent; }
+.ls-fb p { font-size: 16.5px; line-height: 1.5; display: block; }
+.ls-fb p svg { vertical-align: -3px; color: #ffc46b; }
+.ls-fb.hint { background: rgba(255, 184, 77, 0.1); border-color: rgba(255, 184, 77, 0.4); }
+.ls-fb.right { background: rgba(47, 211, 156, 0.1); border-color: rgba(47, 211, 156, 0.45); }
+.ls-fb.shown { background: rgba(255, 125, 110, 0.09); border-color: rgba(255, 125, 110, 0.4); }
+.ls-fb .ls-why { color: #eef0f6; }
+.ls-fb .st-main-btn { justify-self: end; gap: 8px; }
+.ls-fb .ls-ghost { justify-self: start; }
+.ls-result { align-items: center; justify-content: center; text-align: center; gap: 6px; }
+.ls-bigstars .ls-stars svg { width: 64px; height: 64px; }
+.ls-bigstars .ls-stars svg.on { filter: drop-shadow(0 0 18px rgba(255, 196, 107, 0.7)); animation: arStar 0.55s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+.ls-result h2 { font: 300 34px var(--font-ui); }
+.ls-score { font: 400 22px var(--font-ui); } .ls-score b { font-weight: 700; font-size: 34px; } .ls-score small { font-size: 15px; color: var(--st-mute); margin-left: 8px; }
+.ls-xp { color: #ffc46b; font: 700 17px var(--font-ui); }
+
+@media (max-width: 1180px) {
+  .ls-lesson { grid-template-columns: minmax(0, 1fr); }
+  .ls-side { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ls-hero { grid-template-columns: minmax(0, 1fr); } .ls-lead-side { border: 0; padding-left: 0; }
+  .ls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ls-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ls-card.with-fig { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .ls-grid, .ls-side { grid-template-columns: minmax(0, 1fr); }
+  .ls-stage { padding: 16px 14px; min-height: 0; } .ls-choices { grid-template-columns: minmax(0, 1fr); }
+  .ls-prog i { width: 18px; } .ls-hero { padding: 22px 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .ls-body, .ls-bigstars .ls-stars svg.on { animation: none; } }

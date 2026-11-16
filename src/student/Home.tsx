@@ -5,6 +5,7 @@ import { ActivityChart, TimeBars, TopicMap } from './Charts.tsx';
 import { Ico } from './icons.tsx';
 import { go, href, sitePage } from './route.ts';
 import { ts, type StKey } from './strings.ts';
+import { at } from './arcade/text.ts';
 
 const STATS = [
   { k: 'lessons', icon: 'bars', c: '#e5484d', label: 'statLessons' },
@@ -86,6 +87,12 @@ export function Home({ activity, aiOn }: { activity: Activity; aiOn: boolean }) 
         <h2>{t('timeTitle')}</h2>
         <TimeBars week={week} lang={lang} t={t} />
       </section>
+
+      <a className="st-card st-s12 ar-promo" href={href('arcade')} style={{ ['--i' as string]: 5 }}>
+        <span className="ar-badge"><Ico name="star" size={18} />{at(lang, 'badge')}</span>
+        <div><b>{at(lang, 'heroTitle')}</b><p>{at(lang, 'subArcade')}</p></div>
+        <span className="ar-go"><Ico name="play" size={16} />{at(lang, 'play')}</span>
+      </a>
 
       <section className="st-card st-s8 st-ways" style={{ ['--i' as string]: 5 }}>
         {WAYS.map((w) => (

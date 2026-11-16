@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { visualSvg, type Visual } from '../../shared/curriculum/index.ts';
+import { visualSvgPlain as visualSvg, type Visual } from '../../shared/curriculum/index.ts';
 import type { Label } from '../../shared/curriculum/visuals.ts';
 import { lin } from '../../shared/curriculum/types.ts';
 import type { Lang } from '../../shared/types.ts';

@@ -87,6 +87,8 @@ const EN = {
   timeTitle: 'Time and questions', legendMinutes: 'Minutes', legendAsked: 'Questions',
   lessonStepN: 'Step {n} of {total}',
   loading: 'Loading…',
+  navArcade: 'Games for Grades 1–4', tabArcade: 'Games', subArcade: 'Gamified lessons for primary school: one idea at a time',
+  gradeTag: 'Grades 1–4',
 };
 type Dict = typeof EN;
 export type StKey = keyof Dict;
@@ -170,6 +172,8 @@ const RU: Dict = {
   timeTitle: 'Время и вопросы', legendMinutes: 'Минуты', legendAsked: 'Вопросы',
   lessonStepN: 'Шаг {n} из {total}',
   loading: 'Загрузка…',
+  navArcade: 'Игры для 1–4 классов', tabArcade: 'Игры', subArcade: 'Уроки-игры для начальной школы: одна идея за раз',
+  gradeTag: '1–4 классы',
 };
 
 const UZ: Dict = {
@@ -251,6 +255,8 @@ const UZ: Dict = {
   timeTitle: 'Vaqt va savollar', legendMinutes: 'Daqiqa', legendAsked: 'Savollar',
   lessonStepN: '{total} qadamdan {n}-qadam',
   loading: 'Yuklanmoqda…',
+  navArcade: '1–4-sinflar uchun o‘yinlar', tabArcade: 'O‘yinlar', subArcade: 'Boshlang‘ich sinflar uchun o‘yinlashtirilgan darslar: har safar bitta g‘oya',
+  gradeTag: '1–4-sinflar',
 };
 
 const DICTS: Record<Lang, Dict> = { en: EN, ru: RU, uz: UZ };

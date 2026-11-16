@@ -44,6 +44,12 @@ export type Picture =
   | { t: 'press'; force: Label; area: Label; wide?: boolean }
   /** Simple circuit: voltage, resistance, current. */
   | { t: 'circuit'; u: Label; r: Label; i: Label }
+  /** A line graph on axes, drawn to scale. `marks` drop dashed guides to the axes; a label of "?" is the unknown to read off. */
+  | { t: 'chart'; pts: [number, number][]; xMax: number; yMax: number; xStep: number; yStep: number; xName: string; yName: string; marks?: { x: number; y: number; lx?: Label; ly?: Label }[] }
+  /** A block in a tank of water: it floats to the depth its density allows, or sinks. */
+  | { t: 'float'; rho: number }
+  /** Two resistors in series on one battery. */
+  | { t: 'series'; u: Label; r1: Label; r2: Label; i: Label }
   /** A big formula on a card, with an optional line under it. */
   | { t: 'formula'; main: Label; sub?: Label; tone?: Tone }
   /** A grid of dots: rows × columns ways to choose. */
@@ -62,10 +68,11 @@ const COLOR: Record<Tone, string> = {
   coral: '#ff6b5b',
   soft: '#e8dcb9',
 };
-const INK = '#0c1f57';
-const MUTE = '#46507a';
-const LINE = '#cdbd92';
-const ASK = '#e08a00';
+/** Light ("paper") palette for the bot and Telegram; the dark one is for the student area. Swapped around one draw call, never in between. */
+const LIGHT = { INK: '#0c1f57', MUTE: '#46507a', LINE: '#cdbd92', ASK: '#e08a00', PILL: '#fffaf0', PILLASK: '#fff1d6', ASKTXT: '#8a5200', CARD: '#fff4d9', CARD2: '#ffe7b8', GRID: '#e8dcb9', GRID2: '#e6dfc9', BOX: '#fff', WATER: '#bcd8ff', ONLIGHT: '#0c1f57' };
+const DARK = { INK: '#e9ebf2', MUTE: '#a9b2d3', LINE: 'rgba(255,255,255,0.30)', ASK: '#ffb84d', PILL: 'rgba(255,255,255,0.09)', PILLASK: 'rgba(255,184,77,0.18)', ASKTXT: '#ffd08a', CARD: 'rgba(255,255,255,0.06)', CARD2: 'rgba(255,255,255,0.10)', GRID: 'rgba(255,255,255,0.10)', GRID2: 'rgba(255,255,255,0.09)', BOX: '#171c34', WATER: 'rgba(80,140,255,0.38)', ONLIGHT: '#0c1f57' };
+let { INK, MUTE, LINE, ASK, PILL, PILLASK, ASKTXT, CARD, CARD2, GRID, GRID2, BOX, WATER, ONLIGHT } = LIGHT;
+const usePalette = (p: typeof LIGHT) => ({ INK, MUTE, LINE, ASK, PILL, PILLASK, ASKTXT, CARD, CARD2, GRID, GRID2, BOX, WATER, ONLIGHT } = p);
 
 export const VISUAL_W = 800;
 export const VISUAL_H = 450;
@@ -79,7 +86,11 @@ export const ruUnits = (v: string) =>
     .replace(/(\d) kg/g, '$1 кг')
     .replace(/(\d) m³/g, '$1 м³')
     .replace(/(\d) m²/g, '$1 м²')
+    .replace(/(\d) kPa/g, '$1 кПа')
     .replace(/(\d) Pa/g, '$1 Па')
+    .replace(/(\d) g\/cm³/g, '$1 г/см³')
+    .replace(/(\d) m\/s/g, '$1 м/с')
+    .replace(/(\d) mA/g, '$1 мА')
     .replace(/(\d) N/g, '$1 Н')
     .replace(/(\d) V/g, '$1 В')
     .replace(/(\d) A/g, '$1 А')
@@ -107,8 +118,8 @@ const arc = (cx: number, cy: number, r: number, from: number, to: number, stroke
 const pill = (x: number, y: number, v: string, ask = false, size = 32) => {
   const w = Math.max(v.length * size * 0.62 + 26, size + 20);
   return (
-    rect(x - w / 2, y - size * 0.92, w, size * 1.4, ask ? '#fff1d6' : '#fffaf0', 12, `stroke="${ask ? ASK : LINE}" stroke-width="3"`) +
-    text(x, y + size * 0.1, v, size, ask ? '#8a5200' : INK)
+    rect(x - w / 2, y - size * 0.92, w, size * 1.4, ask ? PILLASK : PILL, 12, `stroke="${ask ? ASK : LINE}" stroke-width="3"`) +
+    text(x, y + size * 0.1, v, size, ask ? ASKTXT : INK)
   );
 };
 
@@ -126,7 +137,7 @@ function draw(v: Picture, lang: Lang): string {
         const w = (p.w / sum) * W;
         out += rect(x + 2, Y, w - 4, H, COLOR[p.tone ?? 'blue'], 12);
         const label = L(p.label);
-        if (label) out += text(x + w / 2, Y + H / 2 + 13, label, Math.min(38, Math.max(22, (w - 10) / (label.length * 0.62))), p.tone === 'soft' || p.tone === 'amber' ? INK : '#fff');
+        if (label) out += text(x + w / 2, Y + H / 2 + 13, label, Math.min(38, Math.max(22, (w - 10) / (label.length * 0.62))), p.tone === 'soft' || p.tone === 'amber' ? ONLIGHT : '#fff');
         x += w;
       }
       if (v.total) {
@@ -188,7 +199,7 @@ function draw(v: Picture, lang: Lang): string {
       const offX = 400 - (k * (Math.max(...xs) + Math.min(...xs))) / 2;
       const offY = 235 + (k * Math.max(...ys)) / 2;
       const [A, B, C] = raw.map((p): [number, number] => [offX + k * p[0], offY - k * p[1]]);
-      let out = `<path d="M${A} L${B} L${C} Z" fill="#fff4d9" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>`;
+      let out = `<path d="M${A} L${B} L${C} Z" fill="${CARD}" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>`;
       if (v.right) out += `<path d="M${A[0] + 34} ${A[1]} v-34 h-34" fill="none" stroke="${COLOR.coral}" stroke-width="5"/>`;
       if (v.equal) {
         const tick = (p: [number, number], q: [number, number]) => {
@@ -290,7 +301,7 @@ function draw(v: Picture, lang: Lang): string {
       const Y = (y: number) => cy - y * step;
       let out = '';
       for (let i = -R; i <= R; i++) {
-        out += line(X(i), Y(-R), X(i), Y(R), '#e8dcb9', 2) + line(X(-R), Y(i), X(R), Y(i), '#e8dcb9', 2);
+        out += line(X(i), Y(-R), X(i), Y(R), GRID, 2) + line(X(-R), Y(i), X(R), Y(i), GRID, 2);
       }
       out += line(X(-R), cy, X(R), cy, INK, 4) + line(cx, Y(R), cx, Y(-R), INK, 4);
       out += text(X(R) + 22, cy + 8, 'x', 26) + text(cx, Y(R) - 2 < 18 ? 20 : Y(R) - 2, '', 26) + text(cx + 22, Y(R) + 20, 'y', 26);
@@ -309,7 +320,7 @@ function draw(v: Picture, lang: Lang): string {
     }
     case 'circle': {
       const cx = 400, cy = 225, r = 165;
-      let out = circle(cx, cy, r, v.kind === 'area' ? '#ffe7b8' : '#fff4d9', `stroke="${v.kind === 'around' ? COLOR.amber : INK}" stroke-width="${v.kind === 'around' ? 12 : 6}"`);
+      let out = circle(cx, cy, r, v.kind === 'area' ? CARD2 : CARD, `stroke="${v.kind === 'around' ? COLOR.amber : INK}" stroke-width="${v.kind === 'around' ? 12 : 6}"`);
       if (v.kind === 'd') out += line(cx - r, cy, cx + r, cy, COLOR.coral, 7) + pill(cx, cy - 26, L(v.label));
       else {
         out += line(cx, cy, cx + r * 0.94, cy - r * 0.34, COLOR.coral, 7) + pill(cx + r * 0.42, cy + 44, L(v.label));
@@ -327,7 +338,7 @@ function draw(v: Picture, lang: Lang): string {
           const w = g.w * k, h = g.h * k;
           const y = 225 - h / 2;
           out += rect(x, y, w, h, g.kind === '1' ? COLOR.amber : g.kind === 'x2' ? COLOR.teal : COLOR.blue, 10);
-          out += text(x + w / 2, y + h / 2 + 12 * k, g.kind === '1' ? '1' : g.kind === 'x2' ? 'x²' : 'x', 34 * k, g.kind === '1' ? INK : '#fff');
+          out += text(x + w / 2, y + h / 2 + 12 * k, g.kind === '1' ? '1' : g.kind === 'x2' ? 'x²' : 'x', 34 * k, g.kind === '1' ? ONLIGHT : '#fff');
           x += w + gap * k;
         }
         x -= gap * k;
@@ -344,8 +355,8 @@ function draw(v: Picture, lang: Lang): string {
         rect(x + 3, y + 3, w - 6, h - 6, fill, 10) + text(x + w / 2, y + h / 2 + 12, label, 36, ink);
       return (
         cell(X, Y, A, A, COLOR.blue, `${v.a}²`) +
-        cell(X + A, Y, B, A, COLOR.amber, `${v.a}${v.b}`, INK) +
-        cell(X, Y + A, A, B, COLOR.amber, `${v.a}${v.b}`, INK) +
+        cell(X + A, Y, B, A, COLOR.amber, `${v.a}${v.b}`, ONLIGHT) +
+        cell(X, Y + A, A, B, COLOR.amber, `${v.a}${v.b}`, ONLIGHT) +
         cell(X + A, Y + A, B, B, COLOR.teal, `${v.b}²`) +
         text(X + A / 2, Y + A + B + 34, v.a, 28, MUTE) +
         text(X + A + B / 2, Y + A + B + 34, v.b, 28, MUTE) +
@@ -363,8 +374,10 @@ function draw(v: Picture, lang: Lang): string {
         rect(228, y - 86, 40, 28, '#fff', 6) +
         circle(130, y, 24, INK) +
         circle(290, y, 24, INK) +
-        circle(130, y, 9, '#fff') +
-        circle(290, y, 9, '#fff') +
+        circle(130, y, 13, '#9aa3c7') +
+        circle(290, y, 13, '#9aa3c7') +
+        circle(130, y, 4, INK) +
+        circle(290, y, 4, INK) +
         `<path d="M70 410 H730 m-20 -14 l20 14 l-20 14" fill="none" stroke="${COLOR.coral}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>` +
         pill(400, 410, L(v.s)) +
         pill(520, 90, L(v.v)) +
@@ -386,7 +399,7 @@ function draw(v: Picture, lang: Lang): string {
       const w = v.wide ? 520 : 170;
       const cx = 400;
       return (
-        rect(40, 340, 720, 90, '#e8dcb9', 10) +
+        rect(40, 340, 720, 90, GRID, 10) +
         rect(cx - w / 2, 318, w, 26, COLOR.amber, 8) +
         line(cx, 80, cx, 296, COLOR.coral, 14) +
         `<path d="M${cx - 34} 280 L${cx} 322 L${cx + 34} 280 Z" fill="${COLOR.coral}"/>` +
@@ -399,10 +412,64 @@ function draw(v: Picture, lang: Lang): string {
       return (
         `<rect x="${X1}" y="${Y1}" width="${X2 - X1}" height="${Y2 - Y1}" rx="20" fill="none" stroke="${INK}" stroke-width="6"/>` +
         rect(320, Y1 - 34, 160, 68, COLOR.amber, 12) +
-        text(400, Y1 + 12, L(v.r), 34, INK) +
-        rect(X1 - 44, 170, 88, 100, '#fff', 8, `stroke="${INK}" stroke-width="5"`) +
+        text(400, Y1 + 12, L(v.r), 34, ONLIGHT) +
+        rect(X1 - 44, 170, 88, 100, BOX, 8, `stroke="${INK}" stroke-width="5"`) +
         text(X1, 232, L(v.u), 26, INK) +
-        circle(X2, 220, 48, '#fff', `stroke="${INK}" stroke-width="5"`) +
+        circle(X2, 220, 48, BOX, `stroke="${INK}" stroke-width="5"`) +
+        text(X2, 234, 'A', 38, COLOR.blue) +
+        pill(400, Y2, L(v.i))
+      );
+    }
+    case 'chart': {
+      const X0 = 170, X1 = 740, Y0 = 40, Y1 = 340;
+      const sx = (X1 - X0) / v.xMax, sy = (Y1 - Y0) / v.yMax;
+      const px = (x: number) => X0 + x * sx, py = (y: number) => Y1 - y * sy;
+      let out = '';
+      // a marked value is written in its own label, so the plain axis number at that spot is left out (and an unknown stays hidden)
+      const hasX = (x: number) => (v.marks ?? []).some((m) => L(m.lx) && Math.abs(m.x - x) < 1e-9);
+      const hasY = (y: number) => (v.marks ?? []).some((m) => L(m.ly) && Math.abs(m.y - y) < 1e-9);
+      for (let x = v.xStep; x <= v.xMax + 1e-9; x += v.xStep) out += line(px(x), Y0, px(x), Y1, GRID2, 2) + (hasX(x) ? '' : text(px(x), Y1 + 30, num(x, lang), 22, MUTE));
+      for (let y = v.yStep; y <= v.yMax + 1e-9; y += v.yStep) out += line(X0, py(y), X1, py(y), GRID2, 2) + (hasY(y) ? '' : text(X0 - 14, py(y) + 8, num(y, lang), 22, MUTE, 'end'));
+      out += line(X0, Y1, X1 + 20, Y1, INK, 4) + line(X0, Y1, X0, Y0 - 16, INK, 4);
+      out += `<path d="M${X1 + 8} ${Y1 - 10} L${X1 + 22} ${Y1} L${X1 + 8} ${Y1 + 10}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+      out += `<path d="M${X0 - 10} ${Y0 - 4} L${X0} ${Y0 - 18} L${X0 + 10} ${Y0 - 4}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+      out += text(X1 + 10, Y1 + 66, v.xName, 26, INK, 'end') + text(X0 + 16, Y0 - 12, v.yName, 26, INK, 'start');
+      out += `<polyline points="${v.pts.map(([x, y]) => `${px(x)},${py(y)}`).join(' ')}" fill="none" stroke="${COLOR.coral}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
+      for (const [x, y] of v.pts) out += circle(px(x), py(y), 7, COLOR.coral, `stroke="#fff" stroke-width="3"`);
+      for (const m of v.marks ?? []) {
+        out += `<line x1="${px(m.x)}" y1="${py(m.y)}" x2="${px(m.x)}" y2="${Y1}" stroke="${INK}" stroke-width="3" stroke-dasharray="8 7"/>`;
+        out += `<line x1="${px(m.x)}" y1="${py(m.y)}" x2="${X0}" y2="${py(m.y)}" stroke="${INK}" stroke-width="3" stroke-dasharray="8 7"/>`;
+        out += circle(px(m.x), py(m.y), 10, COLOR.blue, `stroke="#fff" stroke-width="3"`);
+        const lx = L(m.lx), ly = L(m.ly);
+        if (lx) out += pill(px(m.x), Y1 + 38, lx, lx === '?', 24);
+        if (ly) out += pill(X0 - 14 - Math.max(ly.length * 24 * 0.62 + 26, 44) / 2, py(m.y) + 8, ly, ly === '?', 24);
+      }
+      return out;
+    }
+    case 'float': {
+      const TX = 70, TW = 400, TY = 70, TB = 400, WY = 190, bw = 150, bh = 130;
+      const frac = Math.max(0, Math.min(1, v.rho / 1000));
+      const floats = v.rho < 1000;
+      const top = floats ? WY - (1 - frac) * bh : TB - bh - 6;
+      const wname = lang === 'ru' ? 'Вода' : lang === 'uz' ? 'Suv' : 'Water';
+      return (
+        rect(TX, WY, TW, TB - WY, WATER, 8) +
+        `<path d="M${TX} ${WY} q50 -14 100 0 t100 0 t100 0 t100 0" fill="none" stroke="#6fa3ff" stroke-width="5"/>` +
+        rect(TX + TW / 2 - bw / 2, top, bw, bh, COLOR.amber, 10, `stroke="${INK}" stroke-width="5"`) +
+        `<path d="M${TX} ${TY} V${TB} H${TX + TW} V${TY}" fill="none" stroke="${INK}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>` +
+        pill(TX + TW + 175, 120, L(`ρ = ${v.rho} kg/m³`), true, 26) +
+        pill(TX + TW + 170, 300, L(`${wname}: 1000 kg/m³`), false, 24)
+      );
+    }
+    case 'series': {
+      const X1 = 130, X2 = 670, Y1 = 100, Y2 = 350;
+      return (
+        `<rect x="${X1}" y="${Y1}" width="${X2 - X1}" height="${Y2 - Y1}" rx="20" fill="none" stroke="${INK}" stroke-width="6"/>` +
+        rect(240, Y1 - 34, 130, 68, COLOR.amber, 12) + text(305, Y1 + 12, L(v.r1), 30, ONLIGHT) +
+        rect(430, Y1 - 34, 130, 68, COLOR.teal, 12) + text(495, Y1 + 12, L(v.r2), 30, '#fff') +
+        rect(X1 - 44, 170, 88, 100, BOX, 8, `stroke="${INK}" stroke-width="5"`) +
+        text(X1, 232, L(v.u), 26, INK) +
+        circle(X2, 220, 48, BOX, `stroke="${INK}" stroke-width="5"`) +
         text(X2, 234, 'A', 38, COLOR.blue) +
         pill(400, Y2, L(v.i))
       );
@@ -411,7 +478,7 @@ function draw(v: Picture, lang: Lang): string {
       const main = L(v.main);
       const size = Math.min(92, 1240 / Math.max(main.length, 6));
       return (
-        rect(40, 60, 720, 330, v.tone === 'amber' ? '#fff4d9' : '#fff4d9', 28, `stroke="${v.tone === 'amber' ? COLOR.amber : LINE}" stroke-width="4"`) +
+        rect(40, 60, 720, 330, CARD, 28, `stroke="${v.tone === 'amber' ? COLOR.amber : LINE}" stroke-width="4"`) +
         text(400, v.sub ? 215 : 250, main, size, INK) +
         (v.sub ? text(400, 305, L(v.sub), 34, MUTE) : '')
       );
@@ -429,6 +496,29 @@ function draw(v: Picture, lang: Lang): string {
       return out;
     }
   }
+}
+
+/**
+ * The teaching picture in the student area's dark style: light lines and labels on a transparent ground, so it sits on the page's glass
+ * card instead of looking like a paper sheet stuck on top. Same drawing code, different palette.
+ */
+export function visualSvgDark(v: Visual, lang: Lang): string {
+  if (isCard(v)) return drawCard(v, lang);
+  usePalette(DARK);
+  try {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VISUAL_W} ${VISUAL_H}" width="${VISUAL_W}" height="${VISUAL_H}" role="img">${draw(v, lang)}</svg>`;
+  } finally {
+    usePalette(LIGHT);
+  }
+}
+
+/**
+ * The same teaching picture for Grades 5–11 on the web: a plain diagram on a light sheet, with no tile border.
+ * The decorated plate suits the bot and the primary grades; a Grade 7 physics diagram should look like a textbook figure.
+ */
+export function visualSvgPlain(v: Visual, lang: Lang): string {
+  if (isCard(v)) return drawCard(v, lang);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VISUAL_W} ${VISUAL_H}" width="${VISUAL_W}" height="${VISUAL_H}"><rect width="${VISUAL_W}" height="${VISUAL_H}" rx="18" fill="#f7f4ea"/><rect x="1.5" y="1.5" width="${VISUAL_W - 3}" height="${VISUAL_H - 3}" rx="17" fill="none" stroke="#d9d3bf" stroke-width="3"/>${draw(v, lang)}</svg>`;
 }
 
 /**

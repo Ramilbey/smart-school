@@ -7,7 +7,7 @@ import { g7PhysicsTopics } from './g7Physics.ts';
 import { T, hashString, rng, type Question, type Subject, type SubjectId, type Topic } from './types.ts';
 
 export * from './types.ts';
-export { visualSvg, VISUAL_H, VISUAL_W } from './visuals.ts';
+export { visualSvg, visualSvgPlain, visualSvgDark, VISUAL_H, VISUAL_W } from './visuals.ts';
 
 export const subjects: Subject[] = [
   { id: 'math6', grade: 6, emoji: '🧮', title: T('Matematika', 'Математика', 'Mathematics'), book: 'Matematika 6 (Novda Edutainment, 2024)' },

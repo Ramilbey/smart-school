@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { ROUND, explainWhy, hashString, nextTopic, questionFor, subjects, subjectsForGrade, topicById, topicsOf, visualSvg, type Visual } from '../../../shared/curriculum/index.ts';
+import { ROUND, explainWhy, hashString, nextTopic, questionFor, subjects, subjectsForGrade, topicById, topicsOf, visualSvgPlain as visualSvg, type Visual } from '../../../shared/curriculum/index.ts';
 import { freshStudy, xpFor } from '../../../shared/progress.ts';
 import { Confetti, Icon, TopBar } from '../../components/Chrome.tsx';
 import { useNav } from '../../lib/nav.tsx';

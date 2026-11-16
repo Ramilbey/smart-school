@@ -6,6 +6,8 @@ import { StudentApp } from './StudentApp.tsx';
 import '../styles/base.css';
 import '../styles/board.css';
 import './student.css';
+import './arcade/arcade.css';
+import './lessons/lessons.css';
 
 declare global {
   interface Window {

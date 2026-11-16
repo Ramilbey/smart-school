@@ -1,0 +1,48 @@
+/* ============ The older practice sections inside the student area ============
+   Fractions adventure, the linear-function lab and the textbook lessons were built as phone screens for Telegram.
+   Here they sit in the aurora frame as a "stage" with an explanation panel beside it, so they read as part of the same site. */
+
+/* their stylesheets paint the page; in the student area the page stays the aurora */
+html[data-theme] body { background: var(--st-bg) !important; background-image: none !important; }
+
+.lg { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; }
+.lg-side { display: grid; gap: 20px; position: sticky; top: 6px; }
+.lg-side h3 { margin: 14px 0 8px; }
+.lg-side .st-card > h3:first-child { margin-top: 0; }
+.lg-side p { font-size: 15px; line-height: 1.55; color: var(--st-ink2); }
+.lg-side ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.lg-side li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.45; color: var(--st-ink2); }
+.lg-side li svg { flex: none; margin-top: 2px; color: #2fd39c; }
+.lg-note { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--st-line); font-size: 13.5px !important; color: var(--st-mute) !important; }
+.lg-back { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; font: 600 16px var(--font-ui); padding: 18px 20px; }
+.lg-back span { flex: 1; }
+.lg-back svg:first-child { color: #ffc46b; }
+
+.lg-stage { min-width: 0; }
+.st-emb { --app-h: auto; --safe-top: 0px; --safe-bottom: 0px; position: relative; border-radius: 26px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5); }
+.st-emb .screen { min-height: min(720px, calc(100dvh - 190px)); }
+.st-emb .topbar { position: sticky; top: 0; }
+/* the gear opens the Mini App's settings; language is chosen in the header here */
+.st-emb .topbar-right > .icon-btn:last-child { display: none; }
+
+/* Grades 1–4: the painted bazaar keeps its own colours, like a game board set into the frame */
+.st-emb[data-theme='kids'] { background: transparent; border: 0; box-shadow: none; overflow: visible; color: #1e2140; max-width: 620px; margin: 0 auto; }
+/* the page header already names the game, so the map does not repeat it; stations keep their bar (back to the map) */
+.st-emb[data-route='kids-home'] .topbar { display: none; }
+.st-emb[data-route='kids-home'] .screen { background: none; min-height: 0; }
+.st-emb[data-route='kids-home'] .scroll { padding: 0; }
+.st-emb[data-route='kids-home'] :is(.map, .bazaar, .map-art, .kids-map) { border-radius: 26px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5); }
+.st-emb[data-route^='kids-station'] .screen, .st-emb[data-route='kids-complete'] .screen { background: #fff6e6; border-radius: 26px; overflow: hidden; }
+.lg-fractions { grid-template-columns: minmax(0, 1fr) 340px; }
+
+/* Grades 5–11: these lessons are drawn on a light page, so they stay in their real colours: a clean white sheet on the dark site.
+   (An earlier attempt to turn them dark by inverting colours muddied every illustration.) */
+.st-emb[data-theme='academic'] { --maxw: 940px; background: #f4f5f9; color: #0b1330; border-radius: 26px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5); }
+.st-emb[data-theme='academic'] .screen { min-height: 0; }
+.st-emb[data-route='acad-home'] .topbar, .st-emb[data-route='course'] .topbar { display: none; }
+
+@media (max-width: 1180px) {
+  .lg, .lg-fractions { grid-template-columns: minmax(0, 1fr); }
+  .lg-side { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) { .lg-side { grid-template-columns: minmax(0, 1fr); } .st-emb { border-radius: 18px; } }
