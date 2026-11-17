@@ -4,7 +4,8 @@ import { sampleById, sampleFor, type Sample } from '../../../shared/board/sample
 import { Board } from '../../board/Board.ts';
 import { Narrator, type VoiceLang } from '../../board/Narrator.ts';
 import { Player, type PlayState } from '../../board/Player.ts';
-import { streamBoard, type BoardOutcome } from '../../lib/api.ts';
+import { Recorder } from '../../board/Recorder.ts';
+import { streamBoard, transcribeAudio, type BoardOutcome } from '../../lib/api.ts';
 import { useStore } from '../../lib/store.tsx';
 import { track } from '../../lib/track.ts';
 import type { TxKey } from './strings.ts';
@@ -25,6 +26,7 @@ export function useBoardSession(mode: Mode) {
   const engine = useRef<{ board: Board; narrator: Narrator; player: Player } | null>(null);
   const abort = useRef<AbortController | null>(null);
   const asked = useRef(false);
+  const recorder = useRef<Recorder | null>(null);
 
   const [phase, setPhase] = useState<'start' | 'loading' | 'live'>('start');
   const [meta, setMeta] = useState<LessonMeta | null>(null);
@@ -217,10 +219,27 @@ export function useBoardSession(mode: Mode) {
     }
   }, [aiOn, begin, lang, meta, mode, msgs, phase, sample, topic]);
 
+  /** Ends a recording (tap again, a pause after speaking, or time up), has the server write it down, and asks the question. */
+  const finishRecording = useCallback(async () => {
+    const rec = recorder.current;
+    if (!rec) return;
+    recorder.current = null;
+    setListening(false);
+    const wav = await rec.stop();
+    const e = engine.current;
+    if (!wav) { setNotice('notHeard'); e?.player.play(); return; }
+    setNotice('transcribing');
+    const out = await transcribeAudio(wav, lang);
+    if ('text' in out && out.text) { setNotice(''); void ask(out.text); return; }
+    setNotice('error' in out && out.error === 'off' ? 'noMic' : 'notHeard');
+    e?.player.play();
+  }, [ask, lang]);
+
   const toggleMic = useCallback(() => {
     const e = engine.current;
     if (!e) return;
     e.narrator.unlock();
+    if (recorder.current) { void finishRecording(); return; }
     if (listening) { e.narrator.stopListening(); return; }
     setNotice('');
     asked.current = false;
@@ -231,9 +250,23 @@ export function useBoardSession(mode: Mode) {
       onEnd: () => { setListening(false); setInterim(''); if (!asked.current) e.player.play(); },
       onError: (code) => { if (code === 'not-allowed' || code === 'service-not-allowed') setNotice('micDenied'); else if (code !== 'no-speech' && code !== 'aborted') setNotice('noMic'); },
     });
-    if (!stop) { setNotice('noMic'); e.player.play(); return; }
+    if (stop) { setListening(true); return; }
+    // No built-in speech recognition here (Firefox, Telegram, most phones): record the question and let the server write it down.
+    if (!Recorder.supported()) { setNotice('noMic'); e.player.play(); return; }
+    const rec = new Recorder();
+    recorder.current = rec;
     setListening(true);
-  }, [ask, lang, listening]);
+    rec.start({ onAutoStop: () => { if (recorder.current === rec) void finishRecording(); } }).catch((err: Error) => {
+      if (recorder.current === rec) recorder.current = null;
+      rec.cancel();
+      setListening(false);
+      setNotice(err.message === 'denied' ? 'micDenied' : 'noMic');
+      e.player.play();
+    });
+  }, [ask, finishRecording, lang, listening]);
+
+  // a recording still running when the screen closes is stopped and thrown away
+  useEffect(() => () => recorder.current?.cancel(), []);
 
   // Space talks (on a laptop), unless the student is typing
   useEffect(() => {
@@ -267,7 +300,7 @@ export function useBoardSession(mode: Mode) {
   const player = () => engine.current?.player;
   const chapters = meta?.chapters ?? [];
   const chapter = chapterOf[index] ?? 0;
-  const canListen = useMemo(() => new Narrator().canListen, []);
+  const canListen = useMemo(() => new Narrator().canListen || Recorder.supported(), []);
 
   return {
     canvas, terms, speakTerm, phase, meta, sample, source, aiOn, lang, topic, index, total, chapter, chapters, chapterOf, playState, caption, msgs, listening, interim, thinking, notice, rate, detour, canListen,

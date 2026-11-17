@@ -84,6 +84,29 @@ export async function fetchSpeech(text: string, lang: string): Promise<Blob | nu
 
 export type BoardOutcome = 'ok' | 'ai-off' | 'limit-you' | 'limit-all' | 'error';
 
+/** Base64 of bytes, in pieces so a long recording does not overflow the call stack. */
+function toBase64(bytes: Uint8Array): string {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+/** Sends a short WAV of the student's question and gets back the words. 'off' = this server cannot do speech to text. */
+export async function transcribeAudio(wav: Uint8Array, lang: 'en' | 'ru' | 'uz'): Promise<{ text: string } | { error: 'off' | 'limit' | 'failed' }> {
+  const headers: Record<string, string> = { 'content-type': 'application/json' };
+  if (telegram.initData) headers.authorization = `tma ${telegram.initData}`;
+  try {
+    const res = await fetch(`${BASE}/api/transcribe`, { method: 'POST', headers, body: JSON.stringify({ audio: toBase64(wav), lang }), signal: AbortSignal.timeout(30_000) });
+    if (res.status === 503) return { error: 'off' };
+    if (res.status === 429) return { error: 'limit' };
+    if (!res.ok) return { error: 'failed' };
+    const body = (await res.json()) as { text?: string };
+    return { text: typeof body.text === 'string' ? body.text : '' };
+  } catch {
+    return { error: 'failed' };
+  }
+}
+
 /**
  * Asks the whiteboard AI and calls back with each event as soon as its line has arrived (the server streams one JSON object per line).
  * Resolves with how it ended; 'ai-off' means this server has no AI key, so the caller shows a prepared lesson instead.

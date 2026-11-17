@@ -10,6 +10,8 @@ import { validateInitData, type TelegramUser } from './telegramAuth.ts';
 import { TutorRequestError, aiAvailable, askTutor, chatTutorWith, parseTutorRequest, tutorReply } from './tutor.ts';
 import { streamerComplete } from './chatGemini.ts';
 import { takeAiCredit } from './aiUsage.ts';
+import { transcribe, type SttLang } from './transcribe.ts';
+import { looksLikeWav } from '../shared/wav.ts';
 import { BoardRequestError, boardEvents, parseBoardRequest } from './boardAi.ts';
 import { boardAvailable, boardStreamer } from './boardProvider.ts';
 import { SAMPLES } from '../shared/board/samples.ts';
@@ -67,6 +69,28 @@ function whoIsAsking(req: IncomingMessage): { key: string; anon: boolean } | { e
     return v.ok && v.user ? { key: `u:${v.user.id}`, anon: false } : { error: 401 };
   }
   return config.board.anonymous ? { key: `ip:${clientIp(req)}`, anon: true } : { error: 401 };
+}
+
+/** Speech to text for browsers that cannot listen themselves: a short WAV in, the words out (see transcribe.ts). */
+async function handleTranscribe(req: IncomingMessage, res: ServerResponse, cors: Record<string, string>) {
+  if (!config.gemini.keys.length) return send(res, 503, { error: 'stt-off' }, cors);
+  const who = whoIsAsking(req);
+  if ('error' in who) return send(res, 401, { error: 'unauthorized' }, cors);
+  if (rateLimited(`s:${who.key}`, 10)) return send(res, 429, { error: 'slow down', scope: 'you' }, cors);
+  const body = (await readJson(req, 1_400_000)) as { audio?: unknown; lang?: unknown } | null;
+  const audio = typeof body?.audio === 'string' ? body.audio : '';
+  const lang: SttLang = body?.lang === 'ru' || body?.lang === 'uz' ? body.lang : 'en';
+  if (!audio || !looksLikeWav(Buffer.from(audio.slice(0, 64), 'base64'))) return send(res, 400, { error: 'expected a WAV recording' }, cors);
+  const day = new Intl.DateTimeFormat('en-CA', { timeZone: config.reminderTimeZone }).format(new Date());
+  if (!takeAiCredit(`stt:${who.key}`, day, who.anon ? 30 : 60)) return send(res, 429, { error: 'limit', scope: 'you' }, cors);
+  if (!takeAiCredit('g:stt', day, 2000)) return send(res, 429, { error: 'limit', scope: 'everyone' }, cors);
+  try {
+    const text = await transcribe({ keys: config.gemini.keys, models: [config.gemini.model, ...config.gemini.fallbackModels], thinking: config.gemini.thinking }, audio, lang);
+    return send(res, 200, { text }, cors);
+  } catch (e) {
+    console.warn('[stt]', (e as Error).message);
+    return send(res, 502, { error: 'stt-failed' }, cors);
+  }
 }
 
 /** One sentence as an MP3 (see tts.ts): the voice that works in every browser, Telegram's included. */
@@ -208,6 +232,7 @@ async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL) {
 
   if (url.pathname === '/api/board' && req.method === 'POST') return handleBoard(req, res, cors);
   if (url.pathname === '/api/tts' && req.method === 'POST') return handleTts(req, res, cors);
+  if (url.pathname === '/api/transcribe' && req.method === 'POST') return handleTranscribe(req, res, cors);
 
   if (url.pathname === '/api/progress') {
     const auth = authenticate(req);
