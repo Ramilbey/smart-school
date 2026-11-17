@@ -2,7 +2,6 @@ import { GAME_GRADES, GAME_IDS, MAX_LEVEL, gaps, mastery, skillKey, type GameId 
 import { useStore } from '../../lib/store.tsx';
 import { Ico } from '../icons.tsx';
 import { href } from '../route.ts';
-import { ts } from '../strings.ts';
 import { GameArt } from './Boards.tsx';
 import { Round } from './Round.tsx';
 import { useArcade } from './store.ts';
@@ -93,7 +92,6 @@ export function Arcade({ game }: { game: string | null }) {
       <section className="ar-more">
         <h3>{t('moreTitle')}</h3>
         <div>
-          <a className="st-card ar-morecard acc-amber" href={href('fractions')}><span className="st-tile"><Ico name="pie" size={24} /></span><div><b>{ts(lang, 'moreFractions')}</b><p>{ts(lang, 'moreFractionsSub')}</p></div><Ico name="arrow" size={20} /></a>
           <a className="st-card ar-morecard acc-coral" href={href('game')}><span className="st-tile"><Ico name="game" size={24} /></span><div><b>{t('liveTitle')}</b><p>{t('liveSub')}</p></div><Ico name="arrow" size={20} /></a>
         </div>
       </section>

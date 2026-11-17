@@ -37,7 +37,7 @@ Base address: **https://smart-schools.163-245-192-206.sslip.io**
 - **Own progress**, kept on the student's device only: lessons, questions, solved problems, games, time, topic progress, a topic map.
 - **Join a game** from the student area or `/play`.
 - **Telegram bot** with 23 Grade 6–7 textbook topics, generated practice with a four-rung hint ladder, step-by-step homework solver, daily problem, streak reminders, and an AI chat tutor for free-form questions (Uzbek, Russian, English) with a guard that refuses to hand out homework answers.
-- **Mini App**: inside Telegram it opens the same student area as the website, and the bot's deep links land on the matching page (Grades 1–4 games, a lesson, the tutor). The Grade 4 fractions adventure and the Grade 7 linear-function lab are pages of the student area.
+- **Mini App**: inside Telegram it opens the same student area as the website, and the bot's deep links land on the matching page (Grades 1–4 games, a lesson, the tutor). The Grade 7 linear-function lab is a page of the student area; Grades 1–4 practise in the six games, including one on comparing fractions.
 
 **Teachers**
 - Accounts, quizzes by hand, from 23 textbook topics (with the textbook pictures), or **drafted by AI** from a topic or a pasted text (grade, standard or gamified style, question types: multiple choice, true or false, number, short word).

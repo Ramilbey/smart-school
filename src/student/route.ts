@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-export type RouteName = 'home' | 'tutor' | 'explain' | 'homework' | 'game' | 'arcade' | 'fractions' | 'linear' | 'lessons';
-const NAMES: RouteName[] = ['home', 'tutor', 'explain', 'homework', 'game', 'arcade', 'fractions', 'linear', 'lessons'];
+export type RouteName = 'home' | 'tutor' | 'explain' | 'homework' | 'game' | 'arcade' | 'linear' | 'lessons';
+const NAMES: RouteName[] = ['home', 'tutor', 'explain', 'homework', 'game', 'arcade', 'linear', 'lessons'];
 
 export interface Route {
   name: RouteName;

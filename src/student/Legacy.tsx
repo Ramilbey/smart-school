@@ -6,37 +6,20 @@ import { AcadHome } from '../screens/academic/AcadHome.tsx';
 import { AcadPractice, AcadResults } from '../screens/academic/AcadResults.tsx';
 import { AcadSection } from '../screens/academic/AcadSection.tsx';
 import { Course, CourseTopic } from '../screens/course/Course.tsx';
-import { KidsComplete } from '../screens/kids/KidsComplete.tsx';
-import { KidsHome } from '../screens/kids/KidsHome.tsx';
-import { KidsStation } from '../screens/kids/KidsStation.tsx';
 import type { Lang } from '../../shared/types.ts';
 import { Ico } from './icons.tsx';
 import { go, href } from './route.ts';
 import '../styles/shell.css';
-import '../styles/kids.css';
 import '../styles/academic.css';
 import '../styles/clarity.css';
 import '../styles/redesign.css';
 import './legacy.css';
 
-export type Section = 'fractions' | 'linear' | 'lessons';
-const START: Record<Section, Route> = { fractions: { name: 'kids-home' }, linear: { name: 'acad-home' }, lessons: { name: 'course' } };
+export type Section = 'linear' | 'lessons';
+const START: Record<Section, Route> = { linear: { name: 'acad-home' }, lessons: { name: 'course' } };
 
 type T3 = Record<Lang, string>;
 const INFO: Record<Section, { grade: T3; primary: boolean; problem: T3; how: T3[]; note?: T3 }> = {
-  fractions: {
-    grade: { en: 'Grade 4', ru: '4 класс', uz: '4-sinf' }, primary: true,
-    problem: {
-      en: 'Fractions are where many pupils first lose maths: the rules get memorised, but the pieces are never seen. Here every fraction is something you cut, build and compare.',
-      ru: 'На дробях многие ученики впервые теряют математику: правила заучены, а части никто не видел. Здесь каждую дробь режут, собирают и сравнивают.',
-      uz: 'Ko‘p o‘quvchi matematikani aynan kasrlarda yo‘qotadi: qoidalar yodlanadi, lekin bo‘laklar ko‘rilmaydi. Bu yerda har bir kasr kesiladi, yasaladi va taqqoslanadi.',
-    },
-    how: [
-      { en: 'Five stations on a bazaar map, from equal parts to a quick quiz', ru: 'Пять станций на карте базара: от равных частей до быстрого теста', uz: 'Bozor xaritasidagi beshta bekat: teng bo‘laklardan tezkor testgacha' },
-      { en: 'A wrong answer gets a hint, not the answer', ru: 'На ошибку даётся подсказка, а не ответ', uz: 'Xato javobga tayyor javob emas, maslahat beriladi' },
-      { en: 'Stars and badges for finishing a station', ru: 'Звёзды и значки за пройденную станцию', uz: 'Bekatni tugatgani uchun yulduz va nishonlar' },
-    ],
-  },
   linear: {
     grade: { en: 'Grade 7', ru: '7 класс', uz: '7-sinf' }, primary: false,
     problem: {
@@ -78,9 +61,6 @@ const WORDS: Record<'why' | 'how' | 'primary' | 'back', T3> = {
 
 function Screen({ route }: { route: Route }) {
   switch (route.name) {
-    case 'kids-home': return <KidsHome />;
-    case 'kids-station': return <KidsStation station={route.station} />;
-    case 'kids-complete': return <KidsComplete />;
     case 'acad-home': return <AcadHome />;
     case 'acad-section': return <AcadSection section={route.section} />;
     case 'acad-results': return <AcadResults />;
@@ -97,7 +77,7 @@ function Stage({ section }: { section: Section }) {
   const key = JSON.stringify(route);
   const away = route.name === 'welcome' || route.name === 'grades' || route.name === 'teacher' || route.name === 'tutor' || route.name === 'explainer';
   useEffect(() => {
-    if (away) go(route.name === 'tutor' ? 'tutor' : route.name === 'explainer' ? 'explain' : section === 'fractions' ? 'arcade' : 'home');
+    if (away) go(route.name === 'tutor' ? 'tutor' : route.name === 'explainer' ? 'explain' : 'home');
   }, [away, route.name, section]);
   useEffect(() => { document.querySelector('.st-body')?.scrollTo(0, 0); }, [key]);
   if (away) return null;
@@ -109,7 +89,7 @@ function Stage({ section }: { section: Section }) {
   );
 }
 
-/** Fractions adventure, the linear-function lab and the textbook lessons, shown inside the student area with its own frame around them. */
+/** The linear-function lab (and the older textbook lessons), shown inside the student area with its own frame around them. */
 export function Legacy({ section }: { section: Section }) {
   const { lang } = useStore();
   const info = INFO[section];

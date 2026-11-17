@@ -26,7 +26,6 @@ const NAV: Item[] = [
   { name: 'homework', icon: 'homework', label: 'navHomework', side: 'navHomework', title: 'navHomeworkLong', sub: 'subHomework' },
   { name: 'game', icon: 'game', label: 'navGame', side: 'navGameLong', title: 'navGameLong', sub: 'subGame' },
   { name: 'arcade', icon: 'star', label: 'tabArcade', side: 'navArcade', title: 'navArcade', sub: 'subArcade' },
-  { name: 'fractions', icon: 'pie', label: 'moreFractions', side: 'moreFractions', title: 'moreFractions', sub: 'moreFractionsSub' },
   { name: 'linear', icon: 'graph', label: 'moreLinear', side: 'moreLinear', title: 'moreLinear', sub: 'moreLinearSub' },
   { name: 'lessons', icon: 'book', label: 'moreLessons', side: 'moreLessons', title: 'moreLessons', sub: 'moreLessonsSub' },
 ];
@@ -99,7 +98,7 @@ export function StudentApp() {
   else if (route.name === 'game') page = <Game initialCode={route.params.get('code') ?? ''} />;
   else if (route.name === 'arcade') page = <Arcade game={route.params.get('g')} />;
   else if (route.name === 'lessons') page = <Lessons topicId={route.params.get('t')} />;
-  else if (route.name === 'fractions' || route.name === 'linear') page = <Suspense fallback={<Skeleton explainer={false} label={t('loading')} />}><Legacy key={route.name} section={route.name} /></Suspense>;
+  else if (route.name === 'linear') page = <Suspense fallback={<Skeleton explainer={false} label={t('loading')} />}><Legacy key={route.name} section={route.name} /></Suspense>;
   else if (route.name === 'tutor') page = <Suspense fallback={<Skeleton explainer={false} label={t('loading')} />}><TutorScreen key={`t${q}${sid}`} embedded initialTopic={q} initialSample={sid} /></Suspense>;
   else page = <Suspense fallback={<Skeleton explainer label={t('loading')} />}><ExplainerScreen key={`e${q}${sid}`} embedded initialTopic={q} initialSample={sid} /></Suspense>;
 
@@ -135,7 +134,6 @@ export function StudentApp() {
                   <span>{t('navArcade')}</span>
                 </a>
                 {link(byName('game'))}
-                {link(byName('fractions'))}
                 {link(byName('linear'))}
                 {link(byName('lessons'))}
               </>

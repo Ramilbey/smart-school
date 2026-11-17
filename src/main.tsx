@@ -11,7 +11,7 @@ const PAGES: Record<string, string> = {
   g4: 'arcade',
   games: 'arcade',
   arcade: 'arcade',
-  fractions: 'fractions',
+  fractions: 'arcade',
   g7: 'lessons?t=a7-func',
   course: 'lessons',
   lessons: 'lessons',
