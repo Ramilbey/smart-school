@@ -5,6 +5,7 @@ import type { Lang } from '../../shared/types.ts';
 import { Arcade } from './arcade/Arcade.tsx';
 import { Game } from './Game.tsx';
 import { Lessons } from './lessons/Lessons.tsx';
+import { GapFinder } from './gaps/GapFinder.tsx';
 import { Home } from './Home.tsx';
 import { Homework } from './Homework.tsx';
 import { Ico } from './icons.tsx';
@@ -15,8 +16,6 @@ import { useActivity } from './useActivity.ts';
 // the whiteboard screens bring a maths typesetter with them, so they load only when opened
 const TutorScreen = lazy(() => import('../screens/tutor/BoardScreen.tsx').then((m) => ({ default: m.TutorScreen })));
 const ExplainerScreen = lazy(() => import('../screens/tutor/BoardScreen.tsx').then((m) => ({ default: m.ExplainerScreen })));
-// the older practice sections bring their own screens and styles, so they load only when opened
-const Legacy = lazy(() => import('./Legacy.tsx').then((m) => ({ default: m.Legacy })));
 
 type Item = { name: RouteName; icon: 'home' | 'tutor' | 'explain' | 'homework' | 'game' | 'star' | 'pie' | 'graph' | 'book'; label: StKey; side: StKey; title: StKey; sub: StKey };
 const NAV: Item[] = [
@@ -98,7 +97,7 @@ export function StudentApp() {
   else if (route.name === 'game') page = <Game initialCode={route.params.get('code') ?? ''} />;
   else if (route.name === 'arcade') page = <Arcade game={route.params.get('g')} />;
   else if (route.name === 'lessons') page = <Lessons topicId={route.params.get('t')} />;
-  else if (route.name === 'linear') page = <Suspense fallback={<Skeleton explainer={false} label={t('loading')} />}><Legacy key={route.name} section={route.name} /></Suspense>;
+  else if (route.name === 'linear') page = <GapFinder />;
   else if (route.name === 'tutor') page = <Suspense fallback={<Skeleton explainer={false} label={t('loading')} />}><TutorScreen key={`t${q}${sid}`} embedded initialTopic={q} initialSample={sid} /></Suspense>;
   else page = <Suspense fallback={<Skeleton explainer label={t('loading')} />}><ExplainerScreen key={`e${q}${sid}`} embedded initialTopic={q} initialSample={sid} /></Suspense>;
 

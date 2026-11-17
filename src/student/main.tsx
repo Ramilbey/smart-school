@@ -9,6 +9,7 @@ import '../styles/board.css';
 import './student.css';
 import './arcade/arcade.css';
 import './lessons/lessons.css';
+import './gaps/gaps.css';
 
 declare global {
   interface Window {
