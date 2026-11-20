@@ -11,7 +11,7 @@ import { createFilm } from './film.js';
 import { createAnamorph } from './anamorph.js';
 import { createShapes } from './shapes.js';
 import { quality, frame as qualityFrame } from './quality.js';
-import { BOT_URL, T } from './i18n.js';
+import { TRY_PATH, T } from './i18n.js';
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.ticker.lagSmoothing(0);
@@ -117,8 +117,7 @@ function applyLang() {
 }
 
 /* ---------- links, QR ---------- */
-for (const id of ['#cta-top', '#cta-hero', '#cta-bot']) $(id).href = BOT_URL;
-QRCode.toString(BOT_URL, { type: 'svg', margin: 0, color: { dark: '#0B1038', light: '#ffffff' } }).then((svg) => { $('#qr').innerHTML = svg; });
+QRCode.toString(new URL(TRY_PATH, location.href).href, { type: 'svg', margin: 0, color: { dark: '#0B1038', light: '#ffffff' } }).then((svg) => { $('#qr').innerHTML = svg; });
 renderDots();
 
 /* ---------- sections (the header turns light or dark with the one under it) ---------- */
@@ -289,7 +288,7 @@ if (!reduced) {
   gsap.from('.window', { y: 90, opacity: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: '.window', start: 'top 88%' } });
   gsap.from('.r-row', { x: -24, opacity: 0, duration: 0.5, stagger: 0.07, ease: 'power2.out', scrollTrigger: { trigger: '#reportGrid', start: 'top 85%' } });
   gsap.from('.missed', { scale: 0.92, opacity: 0, duration: 0.6, ease: 'back.out(2)', scrollTrigger: { trigger: '.missed', start: 'top 95%' } });
-  gsap.from('.try-copy > *, #owl2, .qr', { y: 50, opacity: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out', scrollTrigger: { trigger: '.try-row', start: 'top 85%' } });
+  gsap.from('.try-copy > *, #owl2, .qr-wrap', { y: 50, opacity: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out', scrollTrigger: { trigger: '.try-row', start: 'top 85%' } });
   gsap.to('#owl2', { y: -8, duration: 2, yoyo: true, repeat: -1, ease: 'sine.inOut' });
 }
 

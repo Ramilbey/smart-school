@@ -1,18 +1,19 @@
 // All site text, in English.
 // The AI hub's inner dashboard (pill names, tags, log lines) is a product mock-up.
-export const BOT_URL = 'https://t.me/yordamchi_ustoz_ai_bot?start=demo';
+// Where the try buttons and the QR code lead: the judges' Start here page.
+export const TRY_PATH = '/start';
 
 // In headings, *text* is drawn in the accent colour.
 export const T = {
   en: {
     skip: 'Skip', chapters: 'Chapters', motionOn: 'Motion on', motionOff: 'Motion off',
     nav1: 'How it works', nav2: "Zukko's AI", nav3: 'For teachers', nav4: 'The film', nav5: 'Teacher login', nav6: 'Student area', nav7: 'Start here',
-    ctaTop: 'Try it in Telegram', ctaFilm: 'Watch the 1:47 film', ctaBot: 'Open the bot',
+    ctaTop: 'Try it now', ctaFilm: 'Watch the 1:47 film', ctaBot: 'Start here', ctaStudent: 'Student area',
     ch0: 'Meet Zukko', ch1: 'Connected campus', ch2: 'The loop', ch3: 'How Zukko thinks', ch4: 'Two ages', ch5: 'Hints', ch6: 'The report', ch7: 'The film', ch8: 'The school', ch9: 'Try it',
     anLead: 'How do we build tomorrow?', anHint: 'Scroll or drag to change your point of view', anView: 'A question of perspective', anResolve: 'Resolve the word', anChange: 'Change perspective', anWord: 'CONNECT',
     anOff: 'From here it is scattered.', anOn: 'From here: one word, {w}.', anSame1: 'Different perspectives.', anSame2: 'One shared vision.', anCredit: 'An anamorphic sculpture of slats, each at a different depth.',
     anSaying: 'today’s learners with tomorrow’s guidance—where teachers, AI, and global knowledge light the path forward.',
-    badge: 'A prototype for UzHack, working in Telegram',
+    badge: 'A prototype for UzHack, working in any browser',
     h1: 'Make sure every student *understood.*',
     heroSub: 'Zukko asks a short quiz, gives hints instead of answers, and shows the teacher who needs help, in a class of 35.',
     stripCap: 'A sample class of 35: 24 understood, 8 need a hint, 3 absent',
@@ -38,12 +39,13 @@ export const T = {
     missedQ: 'Most missed. Four of seven students got it wrong.',
     hgC1a: 'Where curiosity meets', hgC1b: 'real-time intelligence.', hgC2a: 'Instant clarity for teachers,', hgC2b: 'infinite possibilities for students.', hgC3a: 'Adaptive learning engine', hgC3b: 'running beneath every lesson.', hgC4a: 'Empowering educators', hgC4b: 'to lead the next generation.',
     filmTitle: 'The whole idea in 1:47.', capNote: 'The pitch film, with English voice-over and captions.',
-    mapTag: 'The plan for every school', mapTitle: 'Telegram is the demo. *The school is the product.*',
-    mapBody: 'In production, every school gets its own server, its own Wi-Fi and AI that runs inside the building. The demo uses Telegram only so you can try it in a minute.',
+    mapTag: 'The plan for every school', mapTitle: 'The web app is the demo. *The school is the product.*',
+    mapBody: 'In production, every school gets its own server, its own Wi-Fi and AI that runs inside the building. Today the demo runs on one cloud server, so you can try it in a minute from any browser.',
     stage0: 'A planet', stage1: 'A country', stage2: 'A school',
     lensTitle: 'A server in the school. Its own Wi-Fi. AI inside the building.', tPlan: 'Planned: not built yet',
     mapNote: 'Illustration. The dots and cities are not real schools.',
-    tryTitle: 'Try it now.', tryBody: 'Open the bot in Telegram. Grades 6 to 7, 23 textbook topics.',
+    tryTitle: 'Try it now.', tryBody: 'Open it in any browser, or scan the code with a phone. Nothing to install, and pupils need no login.',
+    tryL1: 'Equation gap finder', tryL2: 'AI tutor that draws', tryL3: 'Games for Grades 1–4', tryL4: 'Teacher portal and live games', tryScan: 'Scan to open on a phone',
     foot: 'A prototype for UzHack. Lesson text is a draft awaiting teacher review.',
     shAsk: 'Raise a hand and show three fingers. Your other hand makes the shape bigger, smaller, and spins it.',
     shStart: 'Turn on camera and voice', shDemo: 'No camera? Watch the demo', shStop: 'Turn off camera',
