@@ -6,7 +6,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const smoother = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * t * (t * (t * 6 - 15) + 10); };
 const rand = (seed) => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 
-export function createFilm({ pin, stage, wall, title, note, shade, video }, { reduced = false } = {}) {
+export function createFilm({ pin, stage, wall, title, note, shade, video, next }, { reduced = false } = {}) {
   let slats = [], count = 0;
 
   const build = () => {
@@ -68,6 +68,9 @@ export function createFilm({ pin, stage, wall, title, note, shade, video }, { re
     const text = appear * (1 - smoother(0.5, 0.68, p));
     title.style.opacity = String(text); title.style.transform = `translateY(${((1 - appear) * 34 - grow * 24).toFixed(1)}px)`;
     note.style.opacity = String(text);
+
+    // once the film fills the screen, a bar says what comes after it, so the page does not seem to end here
+    if (next) { const n = reduced ? 1 : smoother(0.72, 0.88, p); next.style.opacity = n.toFixed(3); next.style.transform = `translate(-50%, ${((1 - n) * 18).toFixed(1)}px)`; next.style.pointerEvents = n > 0.5 ? 'auto' : 'none'; }
   };
   return { frame };
 }

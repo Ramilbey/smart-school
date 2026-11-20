@@ -132,7 +132,7 @@ if (!reduced) { try { hg = createHeroGlobe(hgCv, { reduced }); } catch (e) { doc
 const filmRun = $('#filmRun');
 /* the shapes chapter: the original hand-figure app in a frame, with a voice (see shapes.js) */
 createShapes($('#shapes'), { reduced });
-const film = createFilm({ pin: $('#filmPin'), stage: $('#filmStage'), wall: $('#slats'), title: $('#filmTitle'), note: $('#filmNote'), shade: $('#vshade'), video: $('#vid') }, { reduced });
+const film = createFilm({ pin: $('#filmPin'), stage: $('#filmStage'), wall: $('#slats'), title: $('#filmTitle'), note: $('#filmNote'), shade: $('#vshade'), video: $('#vid'), next: $('#filmNext') }, { reduced });
 let filmP = 0, filmE = 0, filmT = performance.now();
 const sm = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 
@@ -295,9 +295,12 @@ if (!reduced) {
 /* ---------- the film ---------- */
 const vid = $('#vid'), vframe = $('#vframe');
 $('#play').addEventListener('click', () => { vid.play(); vid.focus(); });
-vid.addEventListener('play', () => vframe.classList.add('playing'));
-vid.addEventListener('pause', () => vframe.classList.remove('playing'));
-vid.addEventListener('ended', () => vframe.classList.remove('playing'));
+const filmEnd = $('#filmEnd'), filmPin = $('#filmPin');
+vid.addEventListener('play', () => { vframe.classList.add('playing'); filmPin.classList.add('playing'); filmPin.classList.remove('ended'); filmEnd.hidden = true; });
+vid.addEventListener('pause', () => { vframe.classList.remove('playing'); filmPin.classList.remove('playing'); });
+/* at the end the film hands over to the page: what comes next, and a way to try it */
+vid.addEventListener('ended', () => { vframe.classList.remove('playing'); filmPin.classList.remove('playing'); if (document.fullscreenElement) document.exitFullscreen?.(); filmEnd.hidden = false; filmPin.classList.add('ended'); });
+$('#filmAgain').addEventListener('click', () => { filmEnd.hidden = true; filmPin.classList.remove('ended'); vid.currentTime = 0; vid.play(); });
 new IntersectionObserver(([e]) => { if (!e.isIntersecting) vid.pause(); }, { threshold: 0.05 }).observe(vframe);
 
 /* ---------- jumping around ---------- */

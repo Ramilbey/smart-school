@@ -360,6 +360,27 @@ body.still #hgCanvas, body.hg-fallback #hgCanvas { display: none; }
 .slat { position: absolute; top: 0; height: 100%; background-color: #cfd4dc; background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 38%, rgba(0, 0, 0, 0.3)); box-shadow: inset -1px 0 rgba(0, 0, 0, 0.45); will-change: transform; backface-visibility: visible; }
 .film-note { position: absolute; left: 0; right: 0; bottom: clamp(22px, 5vh, 52px); margin: 0; text-align: center; color: #9aa6d8; will-change: opacity; }
 body.still .film-run { height: 100vh; }
+/* the bar that says what comes after the film; it fades while the film plays */
+.film-next { position: absolute; left: 50%; bottom: clamp(70px, 10vh, 96px); transform: translate(-50%, 0); width: max-content; max-width: calc(100vw - 32px); opacity: 0; pointer-events: none; z-index: 3; will-change: opacity, transform; }
+.fn-in { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 8px 8px 8px 18px; border-radius: 99px; background: rgba(10, 14, 18, 0.72); border: 1px solid rgba(255, 255, 255, 0.16); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: opacity 0.35s; }
+.film-pin.playing .fn-in, .film-pin.ended .fn-in { opacity: 0; pointer-events: none; }
+.fn-lead { font: 600 14px var(--g); color: #9aa6d8; margin-right: 6px; }
+.fn-in a { padding: 8px 14px; border-radius: 99px; font: 600 15px var(--g); color: #e9eeff; text-decoration: none; transition: background 0.2s; }
+.fn-in a:hover { background: rgba(255, 255, 255, 0.1); }
+.fn-in a.fn-go { background: var(--mint); color: var(--ink); }
+.fn-down { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: var(--mint); animation: fnBob 1.6s ease-in-out infinite; }
+.fn-down svg { width: 18px; height: 18px; }
+@keyframes fnBob { 50% { transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .fn-down { animation: none; } }
+@media (max-width: 700px) { .fn-lead { flex-basis: 100%; text-align: center; margin: 0 0 2px; } .fn-in { padding: 10px; border-radius: 22px; } .fn-in a { font-size: 14px; padding: 7px 11px; } .fn-down { display: none; } }
+/* the end card: the film hands over to the rest of the page */
+.film-end { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; background: rgba(8, 11, 22, 0.86); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.film-end[hidden] { display: none; }
+.film-end:not([hidden]) ~ .play { display: none; }
+.film-end .fe-t { margin: 0; font: 800 clamp(24px, 3.6vw, 46px)/1.08 var(--u); letter-spacing: -0.04em; color: #fff; text-wrap: balance; }
+.film-end .fe-s { margin: 0; max-width: 560px; font-size: clamp(15px, 1.6vw, 18px); color: #b8c2ee; text-wrap: balance; }
+.film-end .fe-btns { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin-top: 8px; }
+@media (max-width: 700px) { .film-end .fe-s { display: none; } .film-end .btn { height: 46px; padding: 0 16px; font-size: 15px; } }
 
 /* ---------- words on the finished picture: they rise from below and turn over like a drum as you scroll ---------- */
 .hg-run { height: 800vh; }
