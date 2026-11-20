@@ -281,7 +281,7 @@ function hostView() {
   if (h.status === 'lobby') {
     body = `<div class="card pad-lg stack">
       <div class="host-top"><div class="stack" style="gap:10px"><p class="mute">${tr('joinAt')} <b style="color:#fff">${esc(joinUrl('').replace(/\?code=$/, '').replace(/^https?:\/\//, ''))}</b> ${tr('joinCode')}</p><div class="code" aria-label="code">${esc(h.code)}</div></div>${S.qr ? `<div class="qr"><img alt="QR" src="${S.qr}"/></div>` : ''}</div>
-      <label class="field"><span>${tr('joinBase')}</span><input type="text" id="join-base" value="${esc(S.joinBase)}" /><small class="dim">${tr('joinBaseHelp')}</small></label></div>
+      <label class="field"><span>${tr('joinBase')}</span><input type="text" id="join-base" value="${esc(S.joinBase)}" />${/^(localhost|127\.|\[?::1\]?$)/.test(location.hostname) ? `<small class="dim">${tr('joinBaseHelp')}</small>` : ''}</label></div>
       <div class="card stack"><div class="row between"><h3>${h.players.length ? tr('studentsN', { n: h.players.length }) : tr('waiting')}</h3><span class="dim small">${tr('waitStart')}</span></div>
       <div class="players">${h.players.map((p) => `<span class="player ${p.online ? '' : 'away'}"><i></i>${esc(p.name)}${p.team !== null ? ` <span style="color:${COLORS[p.team % 6]}">●</span>` : ''}<button data-act="kick" data-pid="${p.id}" aria-label="${tr('kick')}">✕</button></span>`).join('')}</div></div>
       <div class="row"><button class="btn primary lg" data-act="start" ${h.players.length ? '' : 'disabled'}>▶ ${tr('start')}</button><button class="btn ghost" data-act="end">${tr('endGame')}</button></div>`;

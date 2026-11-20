@@ -6,7 +6,7 @@ export const BOT_URL = 'https://t.me/yordamchi_ustoz_ai_bot?start=demo';
 export const T = {
   en: {
     skip: 'Skip', chapters: 'Chapters', motionOn: 'Motion on', motionOff: 'Motion off',
-    nav1: 'How it works', nav2: "Zukko's AI", nav3: 'For teachers', nav4: 'The film', nav5: 'Teacher login', nav6: 'Student area',
+    nav1: 'How it works', nav2: "Zukko's AI", nav3: 'For teachers', nav4: 'The film', nav5: 'Teacher login', nav6: 'Student area', nav7: 'Start here',
     ctaTop: 'Try it in Telegram', ctaFilm: 'Watch the 1:47 film', ctaBot: 'Open the bot',
     ch0: 'Meet Zukko', ch1: 'Connected campus', ch2: 'The loop', ch3: 'How Zukko thinks', ch4: 'Two ages', ch5: 'Hints', ch6: 'The report', ch7: 'The film', ch8: 'The school', ch9: 'Try it',
     anLead: 'How do we build tomorrow?', anHint: 'Scroll or drag to change your point of view', anView: 'A question of perspective', anResolve: 'Resolve the word', anChange: 'Change perspective', anWord: 'CONNECT',

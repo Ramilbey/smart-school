@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Smart Schools: start here</title>
+<meta name="description" content="A five-minute guide to try Smart Schools: the AI tutor, the equation gap finder, games for Grades 1–4, the teacher portal and live class games." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<style>
+  @font-face { font-family: 'Onest'; src: url('/app/fonts/Onest-normal-300-800-latin.woff2') format('woff2'); font-weight: 300 800; font-display: swap; }
+  :root { --bg: #04050a; --ink: #e9ebf2; --ink2: #b7bbcb; --mute: #8a8fa3; --line: rgba(255,255,255,.13); --glass: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025)); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { min-height: 100vh; background: radial-gradient(60% 40% at 12% -6%, rgba(75,134,255,.55), transparent 70%), radial-gradient(50% 36% at 55% -10%, rgba(255,150,70,.42), transparent 70%), radial-gradient(56% 38% at 100% -4%, rgba(146,102,255,.5), transparent 70%), var(--bg); background-attachment: fixed; color: var(--ink); font: 400 16px/1.55 Onest, system-ui, -apple-system, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 60px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; font-size: 21px; font-weight: 300; }
+  .langs { display: flex; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
+  .langs button { border: 0; background: none; color: var(--ink2); font: 600 13px Onest, system-ui, sans-serif; height: 32px; padding: 0 14px; border-radius: 999px; cursor: pointer; }
+  .langs button[aria-pressed='true'] { background: rgba(255,255,255,.17); color: #fff; }
+  h1 { font-weight: 300; font-size: clamp(32px, 5vw, 54px); line-height: 1.08; letter-spacing: -.02em; margin: 46px 0 14px; max-width: 900px; }
+  .lead { font-size: clamp(17px, 1.6vw, 20px); color: var(--ink2); max-width: 820px; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 34px; }
+  .chip { height: 32px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 600; background: rgba(255,255,255,.07); border: 1px solid var(--line); color: var(--ink); }
+  .chip.hot { background: linear-gradient(135deg, #ffc46b, #ff8f5b); color: #1a0a00; border: 0; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .card { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: 22px; background: var(--glass); border: 1px solid var(--line); box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 24px 50px rgba(0,0,0,.4); }
+  .card.wide { grid-column: span 2; }
+  .num { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; font-weight: 700; font-size: 14px; color: var(--c); background: color-mix(in srgb, var(--c) 18%, transparent); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); }
+  .card h2 { margin: 2px 0 0; font-size: 20px; font-weight: 600; line-height: 1.25; }
+  .card p { margin: 0; color: var(--ink2); font-size: 15px; }
+  .try { margin-top: 2px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px dashed rgba(255,255,255,.18); font-size: 14px; color: var(--ink); }
+  .try b { color: var(--c); }
+  .btn { margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 12px; color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; background: linear-gradient(135deg, #3d7bff, #7b5bff); box-shadow: 0 10px 26px rgba(80,100,255,.4); }
+  .btn:hover { filter: brightness(1.08); }
+  .btn.alt { background: rgba(255,255,255,.08); box-shadow: none; border: 1px solid var(--line); }
+  .login { display: flex; gap: 10px; flex-wrap: wrap; font-size: 14px; }
+  .login code { font: 700 15px Onest, system-ui, sans-serif; padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,.08); border: 1px solid var(--line); color: #fff; }
+  .box { margin-top: 30px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .box ul { margin: 6px 0 0; padding-left: 18px; color: var(--ink2); font-size: 15px; }
+  .box li { margin: 5px 0; }
+  .box h3 { margin: 0; font-size: 17px; }
+  footer { margin-top: 30px; color: var(--mute); font-size: 13px; }
+  footer a { color: #9ab8ff; }
+  [data-l='uz'] { display: none; }
+  body.uz [data-l='en'] { display: none; }
+  body.uz [data-l='uz'] { display: revert; }
+  @media (max-width: 900px) { .grid, .box { grid-template-columns: minmax(0, 1fr); } .card.wide { grid-column: auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="/"><svg width="34" height="34" viewBox="-130 -130 260 260" aria-hidden="true"><path d="M12.5 -89.1 A90 90 0 0 1 89.1 -12.5" stroke="#2DE2C4" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M89.1 12.5 A90 90 0 0 1 12.5 89.1" stroke="#5B8CFF" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M-12.5 89.1 A90 90 0 0 1 -89.1 12.5" stroke="#FF6B5B" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M-89.1 -12.5 A90 90 0 0 1 -12.5 -89.1" stroke="#FFB547" stroke-width="24" fill="none" stroke-linecap="round"/><circle r="20" fill="#EEF2FF"/></svg>Smart Schools</a>
+    <div class="langs" role="group" aria-label="Language"><button type="button" data-set="en" aria-pressed="true">English</button><button type="button" data-set="uz" aria-pressed="false">O‘zbekcha</button></div>
+  </header>
+
+  <h1><span data-l="en">Start here: try Smart Schools in five minutes.</span><span data-l="uz">Shu yerdan boshlang: Smart Schools’ni besh daqiqada sinab ko‘ring.</span></h1>
+  <p class="lead"><span data-l="en">An AI learning platform for Uzbek schools, in Uzbek, Russian and English. Pupils get a tutor that draws and speaks and a tool that finds the earlier gap behind a wrong answer. Teachers make quizzes in seconds and run live class games. No login is needed for pupils; everything opens on a phone.</span><span data-l="uz">O‘zbekiston maktablari uchun AI ta’lim platformasi: o‘zbek, rus va ingliz tillarida. O‘quvchilar chizib va gapirib tushuntiradigan repetitor hamda xato javob ortidagi oldingi bo‘shliqni topadigan vositaga ega bo‘ladi. O‘qituvchilar bir zumda test tuzadi va sinf bilan jonli o‘yinlar o‘tkazadi. O‘quvchilar uchun login kerak emas; hammasi telefonda ochiladi.</span></p>
+  <div class="chips"><span class="chip hot"><span data-l="en">Live and working</span><span data-l="uz">Ishlayapti</span></span><span class="chip">EN · RU · UZ</span><span class="chip"><span data-l="en">Phone, browser and Telegram</span><span data-l="uz">Telefon, brauzer va Telegram</span></span><span class="chip"><span data-l="en">260 automated tests</span><span data-l="uz">260 ta avtomatik test</span></span></div>
+
+  <div class="grid">
+    <section class="card wide" style="--c:#ffb84d">
+      <span class="num">1</span>
+      <h2><span data-l="en">Equation gap finder: the wrong answer tells us what is missing</span><span data-l="uz">Tenglamadagi bo‘shliqni topish: xato javob nima yetishmasligini aytadi</span></h2>
+      <p><span data-l="en">Most mistakes in Grade 7 equations come from a skill missed in Grade 5 or 6. Solve one equation; the app matches your wrong answer to the mistake behind it, checks the skills underneath on a live map, teaches the missing one in two minutes, then gives you the same equation again. It also writes a one-line summary for the teacher.</span><span data-l="uz">7-sinf tenglamalaridagi ko‘p xatolar 5–6-sinfda o‘tkazib yuborilgan ko‘nikmadan keladi. Bitta tenglamani yeching: ilova xato javobni uning sababi bilan solishtiradi, pastdagi ko‘nikmalarni jonli xaritada tekshiradi, yetishmaganini ikki daqiqada o‘rgatadi va o‘sha tenglamani yana beradi. O‘qituvchi uchun bir qatorli xulosa ham yozadi.</span></p>
+      <div class="try"><span data-l="en"><b>Try:</b> on 3(x − 2) = x + 4, multiply only the x by 3 (answer 3 instead of 5) and watch it find "Opening brackets".</span><span data-l="uz"><b>Sinab ko‘ring:</b> 3(x − 2) = x + 4 da faqat x ni 3 ga ko‘paytiring (5 o‘rniga 3) va u «Qavslarni ochish»ni qanday topishini ko‘ring.</span></div>
+      <a class="btn" href="/student#/linear"><span data-l="en">Open the gap finder</span><span data-l="uz">Bo‘shliqni topishni ochish</span> →</a>
+    </section>
+    <section class="card" style="--c:#6fa3ff">
+      <span class="num">2</span>
+      <h2><span data-l="en">AI tutor that draws and speaks</span><span data-l="uz">Chizib va gapirib tushuntiradigan AI repetitor</span></h2>
+      <p><span data-l="en">Ask any school topic. It explains at once, drawing on a board while it speaks. Interrupt by typing or by voice.</span><span data-l="uz">Istalgan maktab mavzusini so‘rang. U darhol doskada chizib, gapirib tushuntiradi. Yozib yoki ovoz bilan to‘xtatish mumkin.</span></p>
+      <a class="btn" href="/student#/tutor?q=Why%20does%20ice%20float%20on%20water"><span data-l="en">Ask the tutor</span><span data-l="uz">Repetitordan so‘rash</span> →</a>
+    </section>
+    <section class="card" style="--c:#2fd39c">
+      <span class="num">3</span>
+      <h2><span data-l="en">Six games for Grades 1–4</span><span data-l="uz">1–4-sinflar uchun oltita o‘yin</span></h2>
+      <p><span data-l="en">Each game targets one thing young pupils get stuck on. The level follows the child; a wrong answer gets an explanation and a second try; a skills map shows the gaps.</span><span data-l="uz">Har bir o‘yin kichik o‘quvchilar qiynaladigan bitta narsaga qaratilgan. Daraja bolaga moslashadi; xato javobga tushuntirish va ikkinchi urinish beriladi; xarita bo‘shliqlarni ko‘rsatadi.</span></p>
+      <a class="btn" href="/student#/arcade"><span data-l="en">Play a game</span><span data-l="uz">O‘ynash</span> →</a>
+    </section>
+    <section class="card" style="--c:#ff7d6e">
+      <span class="num">4</span>
+      <h2><span data-l="en">Homework helper, step by step</span><span data-l="uz">Uy vazifasi yordamchisi, qadamma-qadam</span></h2>
+      <p><span data-l="en">Type a problem and reveal one step at a time, so the pupil does the thinking. Every step is computed exactly, not guessed.</span><span data-l="uz">Masalani yozing va qadamlarni birma-bir oching: o‘ylaydigan o‘quvchining o‘zi. Har bir qadam aniq hisoblanadi.</span></p>
+      <div class="try"><b><span data-l="en">Try:</span><span data-l="uz">Sinab ko‘ring:</span></b> 3x − 5 = 2x + 4</div>
+      <a class="btn" href="/student#/homework"><span data-l="en">Open the helper</span><span data-l="uz">Yordamchini ochish</span> →</a>
+    </section>
+    <section class="card wide" style="--c:#a78bfa">
+      <span class="num">5</span>
+      <h2><span data-l="en">Teacher portal: a quiz in seconds, a live game in class</span><span data-l="uz">O‘qituvchi portali: bir zumda test, sinfda jonli o‘yin</span></h2>
+      <p><span data-l="en">Press <b>Use the demo teacher</b>. Ask AI "Who is struggling?" or "Make a gamified quiz about fractions and play it as a race". Start the game: a 6-digit code and a QR code appear. Open the student game page on a phone (or a second browser tab), type the code and a first name, and answer; the teacher's board updates live.</span><span data-l="uz"><b>Use the demo teacher</b> tugmasini bosing. AI’dan «Who is struggling?» yoki «Make a gamified quiz about fractions and play it as a race» deb so‘rang. O‘yinni boshlang: 6 xonali kod va QR chiqadi. Telefonda (yoki ikkinchi oynada) o‘quvchi sahifasini ochib, kod va ismni kiriting; o‘qituvchi ekrani jonli yangilanadi.</span></p>
+      <div class="login"><span data-l="en">Demo login:</span><span data-l="uz">Demo login:</span> <code>ustoz</code> <code>ustoz2026</code></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:auto"><a class="btn" href="/teacher"><span data-l="en">Open the teacher portal</span><span data-l="uz">O‘qituvchi portalini ochish</span> →</a><a class="btn alt" href="/play"><span data-l="en">Student game page</span><span data-l="uz">O‘quvchi o‘yin sahifasi</span></a></div>
+    </section>
+    <section class="card" style="--c:#2de2c4">
+      <span class="num">6</span>
+      <h2><span data-l="en">Telegram bot and Mini App</span><span data-l="uz">Telegram bot va Mini App</span></h2>
+      <p><span data-l="en">Textbook lessons for Grades 6–7, practice with hints, a daily problem and reminders. The menu button opens the same student area inside Telegram.</span><span data-l="uz">6–7-sinf darslik mavzulari, maslahatli mashqlar, kunlik masala va eslatmalar. Menyu tugmasi Telegram ichida o‘sha o‘quvchi bo‘limini ochadi.</span></p>
+      <a class="btn" href="https://t.me/yordamchi_ustoz_ai_bot?start=demo"><span data-l="en">Open the bot</span><span data-l="uz">Botni ochish</span> →</a>
+    </section>
+  </div>
+
+  <div class="box">
+    <section class="card">
+      <h3><span data-l="en">What is simulated</span><span data-l="uz">Nimalar simulyatsiya</span></h3>
+      <ul data-l="en"><li>Smart Attendance: the camera head-count is a fixed sample number.</li><li>The demo teacher's class insights use sample pupils, marked "Demo data" on screen.</li><li>A server with its own AI in every school is planned; today one cloud server runs everything.</li></ul>
+      <ul data-l="uz"><li>Aqlli davomat: kamera hisobi namunaviy son.</li><li>Demo o‘qituvchining sinf tahlili namunaviy o‘quvchilardan iborat va ekranda «Demo data» deb belgilangan.</li><li>Har bir maktabda o‘z AI’li server rejalashtirilgan; hozir hammasi bitta bulut serverda ishlaydi.</li></ul>
+    </section>
+    <section class="card">
+      <h3><span data-l="en">Good to know</span><span data-l="uz">Bilish foydali</span></h3>
+      <ul data-l="en"><li>Switch the language at the top of each page: EN · RU · UZ.</li><li>The gap finder, games and homework helper are computed by code, so their answers are exact and work without AI.</li><li>Pupil names never reach the AI: they are replaced by codes first.</li></ul>
+      <ul data-l="uz"><li>Har bir sahifa tepasida tilni almashtiring: EN · RU · UZ.</li><li>Bo‘shliqni topish, o‘yinlar va uy vazifasi yordamchisi kod bilan hisoblanadi: javoblar aniq va AI’siz ishlaydi.</li><li>O‘quvchi ismlari AI’ga yetib bormaydi: avval kodlarga almashtiriladi.</li></ul>
+    </section>
+  </div>
+  <footer><span data-l="en">Hackathon MVP. Uzbek and Russian lesson texts are drafts awaiting a teacher's review.</span><span data-l="uz">Hakaton MVP. O‘zbek va rus tilidagi dars matnlari o‘qituvchi tekshiruvini kutayotgan qoralamalar.</span> · <a href="/">smart-schools.163-245-192-206.sslip.io</a></footer>
+</div>
+<script>
+  (function () {
+    var set = function (l) {
+      document.body.classList.toggle('uz', l === 'uz');
+      document.documentElement.lang = l;
+      document.querySelectorAll('.langs button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.set === l)); });
+      try { localStorage.setItem('ss-start-lang', l); } catch (e) {}
+    };
+    document.querySelectorAll('.langs button').forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.set); }); });
+    var saved = null;
+    try { saved = localStorage.getItem('ss-start-lang'); } catch (e) {}
+    if (saved === 'uz' || (!saved && /^uz/i.test(navigator.language || ''))) set('uz');
+  })();
+</script>
+</body>
+</html>
